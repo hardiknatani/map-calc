@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32" version="1.1">
+<defs>
+<clipPath id="clip2">
+  <path d="M 0 48 L 9 48 L 9 64 L 0 64 Z M 0 48 "/>
+</clipPath>
+<clipPath id="clip3">
+  <path d="M 12 48 L 30 48 L 30 64 L 12 64 Z M 12 48 "/>
+</clipPath>
+<clipPath id="clip4">
+  <path d="M 32 48 L 51 48 L 51 64 L 32 64 Z M 32 48 "/>
+</clipPath>
+<clipPath id="clip5">
+  <path d="M 53 48 L 71 48 L 71 64 L 53 64 Z M 53 48 "/>
+</clipPath>
+<clipPath id="clip6">
+  <path d="M 74 48 L 83 48 L 83 64 L 74 64 Z M 74 48 "/>
+</clipPath>
+<clipPath id="clip7">
+  <path d="M 0 16 L 9 16 L 9 48 L 0 48 Z M 0 16 "/>
+</clipPath>
+<clipPath id="clip8">
+  <path d="M 12 16 L 30 16 L 30 48 L 12 48 Z M 12 16 "/>
+</clipPath>
+<clipPath id="clip9">
+  <path d="M 32 16 L 51 16 L 51 48 L 32 48 Z M 32 16 "/>
+</clipPath>
+<clipPath id="clip10">
+  <path d="M 53 16 L 71 16 L 71 48 L 53 48 Z M 53 16 "/>
+</clipPath>
+<clipPath id="clip11">
+  <path d="M 74 16 L 83 16 L 83 48 L 74 48 Z M 74 16 "/>
+</clipPath>
+<clipPath id="clip12">
+  <path d="M 0 0 L 9 0 L 9 16 L 0 16 Z M 0 0 "/>
+</clipPath>
+<clipPath id="clip13">
+  <path d="M 12 0 L 30 0 L 30 16 L 12 16 Z M 12 0 "/>
+</clipPath>
+<clipPath id="clip14">
+  <path d="M 32 0 L 51 0 L 51 16 L 32 16 Z M 32 0 "/>
+</clipPath>
+<clipPath id="clip15">
+  <path d="M 53 0 L 71 0 L 71 16 L 53 16 Z M 53 0 "/>
+</clipPath>
+<clipPath id="clip16">
+  <path d="M 74 0 L 83 0 L 83 16 L 74 16 Z M 74 0 "/>
+</clipPath>
+<clipPath id="clip1">
+  <rect x="0" y="0" width="83" height="64"/>
+</clipPath>
+<g id="surface5" clip-path="url(#clip1)">
+<g clip-path="url(#clip2)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 0 250 L 0 150 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip3)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 65 250 L 65 150 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip4)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 130 250 L 130 150 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip5)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 195 250 L 195 150 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip6)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 260 250 L 260 150 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip7)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 0 150 L 0 50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip8)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 65 150 L 65 50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip9)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 130 150 L 130 50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip10)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 195 150 L 195 50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip11)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 260 150 L 260 50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip12)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 0 50 L 0 -50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip13)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 65 50 L 65 -50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip14)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 130 50 L 130 -50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip15)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 195 50 L 195 -50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+<g clip-path="url(#clip16)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:54;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(14.901961%,36.470588%,55.686275%);stroke-opacity:1;stroke-miterlimit:10;" d="M 260 50 L 260 -50 " transform="matrix(0.319231,0,0,0.32,0,0)"/>
+</g>
+</g>
+<pattern id="pattern0" patternUnits="userSpaceOnUse" width="83" height="64" patternTransform="matrix(1.00241,0,0,1,-77.0208,3.8144)">
+<use xlink:href="#surface5"/>
+</pattern>
+</defs>
+<g id="surface1">
+<rect x="0" y="0" width="32" height="32" style="fill:url(#pattern0);stroke:none;"/>
+</g>
+</svg>

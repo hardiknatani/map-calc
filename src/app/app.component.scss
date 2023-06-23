@@ -1,0 +1,156 @@
+#map{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    // z-index: 1;
+  }
+  
+  .map-wrap{
+    height: 100%;
+  }
+  
+  .map-overlay {
+    font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    position: absolute;
+    width: 650px;
+    right: 0;
+    padding: 10px;
+    z-index: 1;
+    // background-color: red;
+  }
+
+  mat-sidenav{
+    overflow: visible  !important;
+    min-width: 20vw !important;
+    max-width: fit-content !important;
+
+
+  }
+
+  ::ng-deep .mat-tab-body-content {
+    overflow:clip !important; 
+    height: 100% !important;
+  }
+  
+  mat-sidenav-content{
+    height: 100vh;
+  }
+  
+  .transparent{
+  background:#ffffff96 ;
+  box-shadow: 1px 0px 17px #0f0f0f45;
+  }
+  
+  .customButton{
+  
+  
+    :hover, .customButton:focus{
+    background: #fff;
+  }}
+  
+  
+  .matlistitem{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  font-size: 14px;
+  mat-icon{
+    font-size: 15px;
+    margin-top: 3px;
+  }
+  button{
+   width: 20px;
+   height: 20px;
+
+  }
+  }
+  
+  .layers-sidebar{
+    background-color: transparent;
+    // min-width: 20vw;
+    // max-width: fit-content;
+    height: 90vh;
+    overflow-x: hidden;
+    display: block;
+    .inner-Extendent {
+      height: 100%;
+      // overflow: auto;
+      position: relative;
+    }
+  }
+  
+  
+  
+
+  
+  
+   
+  #filters{
+  mat-form-field{
+    max-height: 20%;
+  }
+  
+  }
+  
+  .filterArray{
+    mat-form-field{
+  
+      width: 25%;
+      font-size: 12px  !important; 
+      color: black !important;
+      height: 60px;
+      margin-bottom:- 1.25em;
+      text-align: left;
+
+      ::ng-deep .mat-form-field-flex{
+        background-color: white;
+        color: black;
+      }
+
+      
+    .mdc-line-ripple {
+      display: none !important;
+    }
+
+    mdc-line-ripple {
+      display: none !important;
+    }
+    }
+
+  
+    ::ng-deep .mat-form-field {
+        font-size: 11px  !important; 
+        // color: green !important;
+    }
+
+
+  ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
+  }
+  }
+  
+  #addFilterButton{
+      background-color: rgb(var(--color-primary));
+      border-radius: 5px;
+      color: white;
+      box-shadow: 1px 0px 6px #0f0f0f45;
+      padding: 2.5px 5px;
+      font-family: inherit;
+      font-size: 12px;
+      min-width: 50px;
+      white-space: nowrap;
+    }
+  
+  
+    #sidebar-right-legends{
+      width: 300px;
+      
+      visibility: hidden;
+    }
+
+     .maplibregl-ctrl-attrib,.mapboxgl-ctrl-attrib {
+      visibility: hidden !important;
+      display: none !important ;
+     }

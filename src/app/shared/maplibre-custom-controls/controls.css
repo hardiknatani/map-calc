@@ -1,0 +1,191 @@
+.mapbox-control button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mapbox-control button.-active svg {
+  fill: #4264fb;
+}
+
+.mapbox-control-image button {
+  overflow: hidden;
+}
+.mapbox-control-image input[type=file] {
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mapbox-control-inspect-popup {
+  max-height: 40vh;
+  overflow-y: scroll;
+  position: absolute;
+  padding-top: 5px;
+  transform: translate(-50%, 0);
+}
+.mapbox-control-inspect-content {
+  position: relative;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: sans-serif;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+.mapbox-control-inspect-content:before {
+  content: "";
+  width: 0;
+  height: 0;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #fff;
+}
+.mapbox-control-inspect-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+}
+.mapbox-control-inspect-prev, .mapbox-control-inspect-next {
+  padding: 2px 12px;
+  border-radius: 4px;
+}
+.mapbox-control-inspect-prev:hover, .mapbox-control-inspect-next:hover {
+  background: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+.mapbox-control-inspect-prev:hover svg, .mapbox-control-inspect-next:hover svg {
+  fill: #4264fb;
+}
+.mapbox-control-inspect-prev svg, .mapbox-control-inspect-next svg {
+  vertical-align: top;
+}
+.mapbox-control-inspect-prev {
+  margin-right: 6px;
+}
+.mapbox-control-inspect-next {
+  margin-left: 6px;
+}
+.mapbox-control-inspect-grid {
+  width: 100%;
+  min-width: 200px;
+  max-width: 400px;
+  border-collapse: collapse;
+}
+.mapbox-control-inspect-grid tr:not(:last-child) td, .mapbox-control-inspect-grid tr:not(:last-child) th {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.mapbox-control-inspect-key, .mapbox-control-inspect-value {
+  width: 50%;
+  padding: 5px;
+  white-space: break-spaces;
+}
+.mapbox-control-inspect-key {
+  text-align: right;
+}
+.mapbox-control-inspect-value {
+  text-align: left;
+}
+.mapbox-control-inspect-caption {
+  text-align: center;
+  color: #4264fb;
+}
+
+.mapbox-control-styles {
+  display: flex;
+  overflow: hidden;
+}
+.mapbox-control-styles button {
+  width: auto;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+.mapbox-control-styles button + button {
+  border: none;
+}
+.mapbox-control-styles button.-active {
+  background: #f5f5f5;
+}
+
+.mapbox-control-tooltip {
+  padding: 5px 7px;
+  background: #fff;
+  border-radius: 2px;
+  position: absolute;
+  transform: translate(-50%, 0);
+  margin-top: 24px;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 3;
+  /* show tooltip over controls buttons with z-index 2 */
+}
+.mapbox-control-tooltip:empty {
+  display: none;
+}
+#loadingSpinner {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: rgb(var(--color-primary));
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+.maplibregl-popup-close-button{
+  right: 5px;
+  top:5px;
+  transform:scale(2)
+}
+
+.structuralElePopup  .maplibregl-popup-tip{
+display: none;
+}
+/*# sourceMappingURL=controls.css.map */
+
+.mapboxgl-ctrl-group .mapboxgl-legend-list button
+{
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: block;
+     /* padding: 8px 8px 6px;
+     text-align: right; 
+     width: 100%;  */
+    height: auto;
+}
+
+.mapboxgl-legend-switcher
+{ 
+    background: url('data:image/svg+xml;charset=UTF-8,<svg viewBox="0 0 64 64" width="22px" height="22px" xmlns="http://www.w3.org/2000/svg"><path d="M29.78,45.89v5.56H46.44V45.89Zm-11.11,0v5.56h5.56V45.89ZM29.78,34.78v5.56H46.44V34.78Zm-11.11,0v5.56h5.56V34.78ZM29.78,23.67v5.56H46.44V23.67Zm-11.11,0v5.56h5.56V23.67ZM29.78,12.56v5.56H46.44V12.56Zm-11.11,0v5.56h5.56V12.56ZM15.89,7H49.22A2.78,2.78,0,0,1,52,9.78V54.22A2.78,2.78,0,0,1,49.22,57H15.89a2.78,2.78,0,0,1-2.78-2.78V9.78A2.78,2.78,0,0,1,15.89,7Z"></path></svg>');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 70%;
+}
+
+.mapboxgl-tile-boundaries
+{ 
+  background: url('data:image/svg+xml;charset=UTF-8,<svg viewBox="0 0 64 64" width="22px" height="22px" xmlns="http://www.w3.org/2000/svg" ><path d="M40 4h-32c-2.21 0-4 1.79-4 4v32c0 2.21 1.79 4 4 4h32c2.21 0 4-1.79 4-4v-32c0-2.21-1.79-4-4-4zm-24 36h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8zm12 24h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8zm12 24h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8z"></path></svg>');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
