@@ -28,6 +28,10 @@
   transform: translate(-50%, 0);
 }
 .mapbox-control-inspect-content {
+  max-height: 40vh;
+  max-width: 25vw;
+  overflow-y: scroll;
+  overflow-x: clip;
   position: relative;
   padding: 4px 8px;
   font-size: 12px;

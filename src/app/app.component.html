@@ -25,47 +25,19 @@
                     {{layer.name}}
                   </div>
                   <div class="flex flex-row justify-between items-center" >
-                  <button matRipple class=" flex flex-row justify-between rounded-full">
-                    <mat-icon >settings</mat-icon>
-                  </button>
+
                   <button matRipple class=" flex flex-row justify-between rounded-full" (click)="handleLayerVisibility(layer,true)" >
                     <mat-icon *ngIf="layer.active">visibility</mat-icon>
                     <mat-icon *ngIf="!layer.active">visibility_off</mat-icon>
                   </button>
-                  <button matRipple class=" flex flex-row justify-between rounded-full" (click)="addContour(layer.url)" >
-                    <mat-icon>table_view</mat-icon>
+                  <button matRipple class=" flex flex-row justify-between rounded-full" (click)=" showSettings(layer)">
+                    <mat-icon >settings</mat-icon>
                   </button>
                   </div>
                 </div>
               </div>
             </mat-expansion-panel>
 <div class="py-2 px-1" >
-<div *ngIf="showControls==true" class="flex flex-col gap-2" >
-  <mat-form-field>
-    <mat-label> Buffer Radius(In Metres)</mat-label>
-    <input matInput type="text" [formControl]="bufferRadius">
-  </mat-form-field>
-  <button mat-raised-button [disabled]="!bufferRadius.value" (click)="addDemLayer()">
-    Add Dem Layer
-  </button>
-  <div class=" flex flex-row justify-between items-center gap-1 px2 py-1">
-    <mat-form-field  >
-      <mat-select-trigger>
-         <img *ngIf="selectedColorramp.value!='Default'" class="field-image" src="../../../assets/img/colormaps/{{selectedColorramp.value}}.png" >
-      </mat-select-trigger>
-        <mat-select matInput appearance="fill"  [formControl]="selectedColorramp" (selectionChange)="onChangeColorRamp()">                 
-      <mat-option *ngFor="let ramp of colormaps" value="{{ramp.id}}">
-      <img *ngIf="ramp.source" height="10" src="{{ramp.source}}" >
-      <span *ngIf="!ramp.source"> {{ramp.id}} </span>
-      </mat-option>            
-    </mat-select> 
-  </mat-form-field>
-  </div>
-  <!-- <button mat-raised-button (click)="showReliefLayer()">
-    Show Relief
-  </button> -->
-
-</div>
 
                        
 
@@ -94,6 +66,13 @@
       <div #map id="map">
 
       </div>
+<div class="map-position-info" >
+<div class="flex gap-3">
+  <pre id="position-info"></pre>
+  <pre id="zoom-info"></pre>
+</div>
+
+</div>      
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

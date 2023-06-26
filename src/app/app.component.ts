@@ -18,7 +18,6 @@ import { environment } from 'src/environments/environment';
 import TileBoundariesControl from './shared/maplibre-custom-controls/TileBoundariesControl';
 import { TileUtils } from './shared/tileutils';
 import * as turf from '@turf/turf'
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -38,7 +37,7 @@ export class AppComponent implements OnInit,AfterViewInit,OnDestroy {
   mapControls: any;
   showFiller = false;
 
-  selectedConfigLayer = null;
+  selectedConfigLayer:any = null;
   basemaps = basemaps;
   borderAndAreasLayers = borderAndAreasLayers;
   colormaps=colormaps;
@@ -84,32 +83,7 @@ reliefLayer=false;
 showControls=false
 selectedFeature:any;
 tileUtils =new TileUtils()
-projectAreaGeojson:any={}
-mosaicJsonBase={
-  "mosaicjson": "0.0.2",
 
-  "name": "compositing",
-
-  "description": "A simple, light grey world.",
-
-  "version": "1.0.0",
-
-  "attribution": "<a href='http://openstreetmap.org'>OSM contributors</a>",
-
-  "minzoom": 10,
-
-  "maxzoom": 16,
-
-  "quadkey_zoom": 10,
-
-  "bounds": [  ],
-
-  "center": [ ],
-
-  "tiles": {
-
-  }
-}
 
 tileUrl:String=''
 createTileKey(tileIndex) {
@@ -155,10 +129,12 @@ return this.http.get(url)
     let source = this.map.getSource(layerData.id);
     if (!source) {
       this.map.addSource(layerData.id, {
-        type: layerData.type,
+        type: layerData["type"],
         tiles: layerData.tiles,
+        ...((layerData.bounds)&&{"bounds":layerData.bounds}),
+        ...((layerData.volatile)&&{"volatile":layerData.volatile}),
+        ...(layerData.type=='raster'&& {tileSize:512})
       });
-      // layerData.sourceLayer.forEach(element => {
         const layer = this.map.getLayer( layerData.sourceLayer.id);
 
         if (!layer) {
@@ -178,7 +154,6 @@ return this.http.get(url)
       // });
     }
 
-    // layerData.sourceLayer.forEach(element => {
 
       const visibility = this.map.getLayoutProperty(
         layerData.sourceLayer.id,
@@ -199,14 +174,12 @@ return this.http.get(url)
     if (setActive)
       layerData.active = !layerData.active;
 
-      if(layerData.url)
-    {  this.getBoundsFromTitler(layerData).subscribe(data=>this.map.fitBounds(data['bounds']));
-    // this.tileUrl=layerData.url;
-    //   this.addContour(layerData.url);
-    }
   }
 
-
+  generateRandomColor() {
+    let newColor = "#" + (Math.floor(Math.random() * 900000 + 100000)).toString()
+    return newColor
+  };
 
 
   parseFilter(v: any) {
@@ -238,37 +211,10 @@ return this.http.get(url)
     return v;
   }
 
-
-
-      onChangeColorRamp(){
- 
-        let tiles = `${environment.titiler_base_url}/mosaicjson/tiles/WebMercatorQuad/{z}/{x}/{y}@1x.png?url=${this.tileUrl}`;
-        switch (this.selectedColorramp.value) {
-          case "Default":
-            tiles=`${environment.titiler_base_url}/mosaicjson/tiles/WebMercatorQuad/{z}/{x}/{y}@1x.png?url=${this.tileUrl}&nodta=0&bidx=1&rescale=0%2C1`
-            break;
-          default:
-            tiles=`${environment.titiler_base_url}/mosaicjson/tiles/WebMercatorQuad/{z}/{x}/{y}@1x.png?url=${this.tileUrl}&bidx=1&rescale=0%2C1&colormap_name=${this.selectedColorramp.value}&nodata=0`
-            break;
-        }
-        console.log(this.selectedColorramp.value);
-       this.map.removeLayer('project_area_dem_layer')
-        this.map.removeSource('project_area_dem')
-
-        this.map.addSource('project_area_dem',{
-          type:'raster',
-          tiles:[
-            tiles
-          ],
-        });
-        this.map.addLayer({
-          type:'raster',
-          id:'project_area_dem_layer',
-          source:'project_area_dem',
-        });
-
-      }
-
+  showSettings(layer){
+    this.selectedConfigLayer=layer;
+    this.showControls=true;
+  }
 
 
 
@@ -311,115 +257,26 @@ return this.http.get(url)
 
     });
 
-  }
+    this.map.on('mousemove', function (e) {
+      (document.getElementById('position-info') as any).innerHTML =
+      `<b>Lat: </b>${Number(e.lngLat.lat).toFixed(5)}, <b>Lng: </b>${Number(e.lngLat.lng).toFixed(5)}`
+      // JSON.stringify(e.lngLat.wrap());
+      });
 
+      this.map.on('zoom',(e)=>{
+        // console.log(this.map.getZoom());
+        (document.getElementById('zoom-info') as any).innerHTML ='<b>Zoom</b>: '+Number(this.map.getZoom()).toFixed(2)
 
-
- async getMosaicJsonUrl(lat,lng,radius){
-
-  this.projectAreaGeojson={
-    "type": "FeatureCollection",
-    "features": [
-      this.tileUtils.generateBufferCircle(lat,lng,this.bufferRadius.value)
-    ]
-  };
-  
-this.map.addSource('project-area', {
-  type: 'geojson',
-  data: this.projectAreaGeojson,
-});
-
-this.map.addLayer({
-  id: 'project-area-layer',
-  type: 'fill',
-  source: 'project-area',
-  layout: {},
-  paint: {
-    // 'fill-color': colorsArr,
-    'fill-opacity':0.5
-  },
-});
-
-let minZoom = 10;
-let tiles = this.tileUtils.getTiles(this.projectAreaGeojson.features[0].geometry,{min_zoom: minZoom,  max_zoom: minZoom});
-this.tileExtext=[]
-tiles.forEach(tile=>{this.tileExtext.push({x:tile[0],y:tile[1],zoom:tile[2]})})
-
-
-    let data =await lastValueFrom( this.http.post('http://localhost:5000/uploadMosaicJson',{
-      lat:lat,
-      lng:lng,
-      radius:radius
-    }));
-
-
-    this.tileUrl=data['url'];
-    return data
+      })
 
   }
 
-  async addDemLayer(){
-
-    
-  let data:any = await  this.getMosaicJsonUrl(this.selectedFeature.geometry.coordinates[1],this.selectedFeature.geometry.coordinates[0],this.bufferRadius.value); 
-    let bbox:any = turf.bbox(this.projectAreaGeojson)
-    console.log(data)
-    this.map.addSource('project_area_dem',{
-      type:'raster',
-      tiles:[
-        `${environment.titiler_base_url}/mosaicjson/tiles/{z}/{x}/{y}@2x.png?url=${data.url}&algorithm=hillshade&resampling=bilinear`
-      ],
-      tileSize:256
-      // bounds:bbox
-    });
-    this.map.addLayer({
-      type:'raster',
-      id:'project_area_dem_layer',
-      source:'project_area_dem',
-      // minzoom:1
-    });
 
 
-    // this.map.addSource("bounds-source",{
-    //   type:"geojson",
-    //   data:turf.bboxPolygon(data.bounds)
-    // }).addLayer({
-    //   type:'fill',
-    //   source:"bounds-source",
-    //   id:"bounds-layer",
-    //   paint:{
-    //     // "fill-color":'transparent',
-    //     'fill-opacity':0.25
-    //   }
-    // });
 
-    // this.map.addSource("bounds-source2",{
-    //   type:"geojson",
-    //   data:turf.bboxPolygon(bbox)
-    // }).addLayer({
-    //   type:'fill',
-    //   source:"bounds-source2",
-    //   id:"bounds-layer2",
-    //   paint:{
-    //     "fill-color":'red',
-    //     'fill-opacity':0.25
-    //   }
-    // })
-    // this.map.addControl(new TerrainControl({source:'project_area_dem',exaggeration:1}))
-    this.map.moveLayer("project-area-layer")
-  }
 
-  addContour(url){
-let tiles;
-    this.http.get(`${environment.titiler_base_url}/cog/info.geojson?url=${url}`).subscribe(data=>{
-        // let minzoom = data['properties']['minzoom'];
-        let minzoom = 12;
 
-     tiles =  this.tileUtils.getTiles(data['geometry'],{min_zoom:minzoom ,  max_zoom: minzoom});
-     let tileExtent:any=[]
-    tiles.forEach(tile=>{tileExtent.push({x:tile[0],y:tile[1],zoom:tile[2]})});
-    // tiles.forEach(tile=>{this.tileExtext.push({x:tile[0],y:tile[1],zoom:tile[2]})})
-    })
-  }
+
+
 
 }
