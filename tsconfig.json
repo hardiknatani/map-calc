@@ -25,13 +25,16 @@
     ],
     "strictPropertyInitialization": false,
     "noImplicitAny": false
-    ,"allowSyntheticDefaultImports": true
-
+    ,"allowSyntheticDefaultImports": true,
+    "paths": {  "path": [
+      "./node_modules/path-browserify"
+    ]}
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "files": ["src/polyfills.ts"]
 }

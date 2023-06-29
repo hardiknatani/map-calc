@@ -186,10 +186,10 @@ display: none;
     background-size: 70%;
 }
 
-.mapboxgl-tile-boundaries
+/* .mapboxgl-tile-boundaries
 { 
   background: url('data:image/svg+xml;charset=UTF-8,<svg viewBox="0 0 64 64" width="22px" height="22px" xmlns="http://www.w3.org/2000/svg" ><path d="M40 4h-32c-2.21 0-4 1.79-4 4v32c0 2.21 1.79 4 4 4h32c2.21 0 4-1.79 4-4v-32c0-2.21-1.79-4-4-4zm-24 36h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8zm12 24h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8zm12 24h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8z"></path></svg>');
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100%;
-}
+} */

@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSlider } from '@angular/material/slider';
 import * as MapboxDraw from '@mapbox/mapbox-gl-draw';
+// import * as MapboxDraw from './shared/draw-custom-modes/mapbox-draw/index'
 import { DrawCreateEvent } from '@mapbox/mapbox-gl-draw';
 import { InspectControl } from 'mapbox-gl-controls';
 import { IControl, GeoJSONSource, Map } from 'maplibre-gl';
@@ -14,10 +15,14 @@ import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { lastValueFrom } from 'rxjs';
 import { API_KEY, basemaps, borderAndAreasLayers, colormaps } from './shared/map.common';
 import * as maplibregl from 'maplibre-gl';
-import { environment } from 'src/environments/environment';
+import { environment } from '../environments/environment';
 import TileBoundariesControl from './shared/maplibre-custom-controls/TileBoundariesControl';
 import { TileUtils } from './shared/tileutils';
 import * as turf from '@turf/turf'
+import MeasuresControl from 'maplibre-gl-measures';
+import  DrawRectangle from './shared/draw-custom-modes/rectangle/rectangle';
+import CircleMode from './shared/draw-custom-modes/circle/modes/CircleMode';
+import DragCirceMode from './shared/draw-custom-modes/circle/modes/DragCircleMode'
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -31,9 +36,7 @@ export class AppComponent implements OnInit,AfterViewInit,OnDestroy {
   @ViewChild('colorramp', { static: true }) colorramp!: ElementRef<HTMLDivElement>;
   @ViewChild('elevSliderRef', { static: true }) elevSliderRef!: MatSlider;
 
-  @BlockUI() blockUI: NgBlockUI;
- formatNumber=formatNumber
- showElevationGraph=false;
+  // @BlockUI() blockUI: NgBlockUI;
   mapControls: any;
   showFiller = false;
 
@@ -44,12 +47,17 @@ export class AppComponent implements OnInit,AfterViewInit,OnDestroy {
   selectedColorramp = new FormControl('Default')
   API_KEY = environment.maptilerApiKey;
   bufferRadius=new FormControl()
-  drawControlOptions = {
+  drawControlOptions:MapboxDraw.MapboxDrawOptions = {
     displayControlsDefault: false,
     userProperties: true,
+    modes:{
+      ...MapboxDraw.modes,
+      'draw_rectangle':DrawRectangle,
+      'draw_circle':DragCirceMode
+    },
     controls: {
-      // polygon: true,
-      // trash: true
+      line_string:true,
+      polygon: true,
       point:true
     },
   }
@@ -103,12 +111,33 @@ return this.http.get(url)
   ngOnInit(): void {
   this.initMap()
 
-  this.elevationSlider.valueChanges.subscribe(value=>{
-    this.map.setFilter('relief-layer',['>=','elevation',this.parseFilter(value)])
-  });
+     let drawCtrl =  Array.from(document.getElementsByClassName('mapboxgl-ctrl-group')).filter(ele=>ele.children[0].classList.contains('mapbox-gl-draw_ctrl-draw-btn'))[0];
+     let rectangleButton = document.createElement('button');
+     rectangleButton.classList.add('mapbox-gl-draw_ctrl-draw-btn');
+     rectangleButton.classList.add('mapbox-gl-draw_rectangle');
+     rectangleButton.addEventListener('click',()=>{
+      if(this.draw.getMode()!='draw_rectangle') {
+       this.draw.changeMode('draw_rectangle')
+      }else{
+        this.draw.changeMode('static')
+      }
+     })
+     drawCtrl.appendChild(rectangleButton);
 
-  
-  }
+     let circleButton = document.createElement('button');
+     circleButton.classList.add('mapbox-gl-draw_ctrl-draw-btn');
+     circleButton.classList.add('mapbox-gl-draw_circle');
+     circleButton.addEventListener('click',()=>{
+      if(this.draw.getMode()!='draw_circle') {
+       this.draw.changeMode('draw_circle')
+      }else{
+        this.draw.changeMode('simple_select')
+      }
+     });
+     drawCtrl.appendChild(circleButton);
+
+
+}
   ngOnDestroy() {
 
     if (this.bottomSheet._openedBottomSheetRef) {
@@ -216,6 +245,27 @@ return this.http.get(url)
     this.showControls=true;
   }
 
+  toggleSidebar() {
+    const id = "right";
+    let elem = (document.getElementById(id) as any);
+    let classes = elem.className.split(" ");
+    let collapsed = classes.indexOf("collapsed") !== -1;
+
+    let padding = {};
+
+    if (collapsed) {
+      classes.splice(classes.indexOf("collapsed"), 1);
+
+      padding[id] = 300; 
+
+    } else {
+      padding[id] = 0;
+      classes.push("collapsed");
+
+    }
+    elem.className = classes.join(" ");
+  }
+
 
 
 
@@ -237,25 +287,8 @@ return this.http.get(url)
     this.map.addControl(inspectControl)
     this.map.addControl(this.draw);
     this.map.addControl (new TileBoundariesControl())
-    // this.map.addControl(new LegendControl())
-    let that = this
-    // this.map.on('styledata', function () {
-    //   that.layersStyle = that.map.getStyle().layers
-    // })
-    this.map.on('draw.create', (e: DrawCreateEvent) => {
-        this.draw.deleteAll()
-        this.draw.add(e.features[0])
-        this.selectedFeature = e.features[0]
-        this.showControls=true;
-  
-        let lng = this.selectedFeature.geometry.coordinates[0]
-        let lat = this.selectedFeature.geometry.coordinates[1]
-  
-        var marker = new maplibregl.Marker()
-        .setLngLat([lng, lat])
-        .addTo(this.map);
+      let that = this
 
-    });
 
     this.map.on('mousemove', function (e) {
       (document.getElementById('position-info') as any).innerHTML =
@@ -273,7 +306,10 @@ return this.http.get(url)
 
 
 
+  changeMode(){
+    this.draw.changeMode('draw_rectangle')
 
+  }
 
 
 
