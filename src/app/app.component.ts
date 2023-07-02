@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSlider } from '@angular/material/slider';
 import * as MapboxDraw from '@mapbox/mapbox-gl-draw';
-// import * as MapboxDraw from './shared/draw-custom-modes/mapbox-draw/index'
 import { DrawCreateEvent } from '@mapbox/mapbox-gl-draw';
 import { InspectControl } from 'mapbox-gl-controls';
 import { IControl, GeoJSONSource, Map } from 'maplibre-gl';
@@ -21,8 +20,9 @@ import { TileUtils } from './shared/tileutils';
 import * as turf from '@turf/turf'
 import MeasuresControl from 'maplibre-gl-measures';
 import  DrawRectangle from './shared/draw-custom-modes/rectangle/rectangle';
-import CircleMode from './shared/draw-custom-modes/circle/modes/CircleMode';
-import DragCirceMode from './shared/draw-custom-modes/circle/modes/DragCircleMode'
+import DragCirceMode from './shared/draw-custom-modes/circle/modes/DragCircleMode';
+import StaticMode from './shared/draw-custom-modes/static/Static'
+import SaveEditsControl from './shared/maplibre-custom-controls/EditSaveControl';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -33,13 +33,10 @@ export class AppComponent implements OnInit,AfterViewInit,OnDestroy {
 
   @ViewChild('map', { static: true }) private mapContainer!: ElementRef<HTMLElement>;
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
-  @ViewChild('colorramp', { static: true }) colorramp!: ElementRef<HTMLDivElement>;
-  @ViewChild('elevSliderRef', { static: true }) elevSliderRef!: MatSlider;
 
   // @BlockUI() blockUI: NgBlockUI;
   mapControls: any;
   showFiller = false;
-
   selectedConfigLayer:any = null;
   basemaps = basemaps;
   borderAndAreasLayers = borderAndAreasLayers;
@@ -53,7 +50,8 @@ export class AppComponent implements OnInit,AfterViewInit,OnDestroy {
     modes:{
       ...MapboxDraw.modes,
       'draw_rectangle':DrawRectangle,
-      'draw_circle':DragCirceMode
+      'draw_circle':DragCirceMode,
+      'static':StaticMode
     },
     controls: {
       line_string:true,
@@ -64,30 +62,6 @@ export class AppComponent implements OnInit,AfterViewInit,OnDestroy {
   layersStyle: any
   draw: any = ((new MapboxDraw(this.drawControlOptions) as any) as IControl)
 
-  elevationProperties={
-    elevRange:[0,0],
-    interval:10
-  }
-  graduatedColorAttribute= new FormControl()
-  graduatedStepsForm= new FormGroup({ 
-        stop:new FormControl(),
-        color:new FormControl(),
-      
-  })
-elevationSlider = new FormControl(0);
-
- graduatedColorTable:{
-  value:string,
-  color?:string,
-}[]=[
-//   {
-//   value:"0",
-//   color: "transparent"
-// }
-];
-reliefLayer=false;
- tileExtext:any = [
-];
 showControls=false
 selectedFeature:any;
 tileUtils =new TileUtils()
@@ -97,6 +71,10 @@ tileUrl:String=''
 createTileKey(tileIndex) {
   return `${tileIndex.zoom}_${tileIndex.y}_${tileIndex.x}`;
 }
+
+isEditing=false;
+currentEditFeature:any;
+
   constructor(private dialog: MatDialog, private fb: FormBuilder, private bottomSheet: MatBottomSheet, private http: HttpClient) { ; }
 
 
@@ -110,7 +88,6 @@ return this.http.get(url)
 
   ngOnInit(): void {
   this.initMap()
-
      let drawCtrl =  Array.from(document.getElementsByClassName('mapboxgl-ctrl-group')).filter(ele=>ele.children[0].classList.contains('mapbox-gl-draw_ctrl-draw-btn'))[0];
      let rectangleButton = document.createElement('button');
      rectangleButton.classList.add('mapbox-gl-draw_ctrl-draw-btn');
@@ -135,7 +112,6 @@ return this.http.get(url)
       }
      });
      drawCtrl.appendChild(circleButton);
-
 
 }
   ngOnDestroy() {
@@ -271,8 +247,7 @@ return this.http.get(url)
 
   initMap() {
 
-    const initialState = { lng: 5.339355468750009, lat:60.02369688198334, zoom: 13 };
-    // const initialState = { lng: -74.032196, lat: 40.526148, zoom: 9 };
+    const initialState = { lng: 5.339355468750009, lat:60.02369688198334, zoom: 9 };
 
     this.map = new Map({
       container: this.mapContainer.nativeElement,
@@ -286,33 +261,291 @@ return this.http.get(url)
     let inspectControl: IControl = ((new InspectControl() as any) as IControl)
     this.map.addControl(inspectControl)
     this.map.addControl(this.draw);
-    this.map.addControl (new TileBoundariesControl())
-      let that = this
+    this.map.addControl (new TileBoundariesControl());
+    // this.map.addControl(new SaveEditsControl());
+    let that = this
 
 
     this.map.on('mousemove', function (e) {
       (document.getElementById('position-info') as any).innerHTML =
       `<b>Lat: </b>${Number(e.lngLat.lat).toFixed(5)}, <b>Lng: </b>${Number(e.lngLat.lng).toFixed(5)}`
-      // JSON.stringify(e.lngLat.wrap());
       });
 
       this.map.on('zoom',(e)=>{
-        // console.log(this.map.getZoom());
         (document.getElementById('zoom-info') as any).innerHTML ='<b>Zoom</b>: '+Number(this.map.getZoom()).toFixed(2)
+
+      });
+
+      this.map.on('draw.create',(e)=>{
+        let feature = e.features[0];
+        switch (feature.geometry.type) {
+          case 'Polygon':
+            feature['properties']['id']=(Math.floor(Math.random() * 900000 + 100000));
+            let polygonData:any =( this.map.getSource('polygon-draw-source') as GeoJSONSource)._data;
+            polygonData.features.push(feature);
+            (this.map.getSource('polygon-draw-source') as GeoJSONSource).setData(polygonData);
+            break;
+
+          case "LineString":
+            feature['properties']['id']=(Math.floor(Math.random() * 900000 + 100000));
+            let lineData:any =( this.map.getSource('line-draw-source') as GeoJSONSource)._data;
+            lineData.features.push(feature);
+            (this.map.getSource('line-draw-source') as GeoJSONSource).setData(lineData);
+          break;
+
+          case "Point":
+            feature['properties']['id']=(Math.floor(Math.random() * 900000 + 100000));
+            let pointData:any =( this.map.getSource('point-draw-source') as GeoJSONSource)._data;
+            pointData.features.push(feature);
+            console.log(pointData);
+            (this.map.getSource('point-draw-source') as GeoJSONSource).setData(pointData);
+
+
+          break;
+
+          default:
+
+        }
+        console.log(feature)
+
+        this.draw.deleteAll()
+    });
+
+      this.map.on('contextmenu',(event)=>{
+      let selectedFeatures =  this.map.queryRenderedFeatures(event.point);
+      let drawFeatures = selectedFeatures.filter(feature=>(feature.source=='polygon-draw-source' || feature.source=='line-draw-source' || feature.source=='point-draw-source') )
+      if (drawFeatures && drawFeatures.length > 0) {
+        let feature = drawFeatures[0];
+        console.log(feature)
+        this.addFeatureOptionPopup(event,feature)
+
+      }});
+
+      this.map.on('style.load',()=>{
+
+        this.map.addSource("polygon-draw-source",{
+          type:'geojson',
+          data:{
+          type:"FeatureCollection",
+          features:[]
+        }});
+          this.map.addLayer({
+            'id': 'polygon-draw-layer',
+            'type': 'fill',
+            'source': 'polygon-draw-source',
+            'paint': {
+            'fill-color':  '#E21818',
+            "fill-opacity":0.5,
+          'fill-outline-color':'#F84C4C'
+            }
+          });
+
+          this.map.addSource("line-draw-source",{
+            type:'geojson',
+            data:{
+            type:"FeatureCollection",
+            features:[]
+          }});
+            this.map.addLayer({
+              'id': 'line-draw-layer',
+              'type': 'line',
+              'source': 'line-draw-source',
+              'paint': {
+              "line-color":"red",
+              "line-width":5
+              }
+            });
+
+            this.map.addSource("point-draw-source",{
+              type:'geojson',
+              data:{
+              type:"FeatureCollection",
+              features:[]
+            }});
+              this.map.addLayer({
+                'id': 'point-draw-layer',
+                'type': 'symbol',
+                'source': 'point-draw-source',
+                'paint': {
+                  "icon-opacity":1
+                },
+                layout:{
+                  'icon-size':1,
+                  "icon-image":'mapbox-marker-icon-red'
+                }
+              })
 
       })
 
-  }
-
-
-
-  changeMode(){
-    this.draw.changeMode('draw_rectangle')
 
   }
 
 
 
 
+  addFeatureOptionPopup(event,feature){
+    console.log(feature)
+    let options = document.createElement('div');
+
+    let editButton = document.createElement('button')
+    editButton.innerHTML = "Edit"
+    editButton.addEventListener('click', () => {
+      let data:any;
+      this.currentEditFeature;
+
+      switch (feature.geometry.type) {
+        case "Polygon":
+         data =( this.map.getSource('polygon-draw-source') as GeoJSONSource)._data;
+          this.currentEditFeature = (data.features.filter(ele=> ele.properties.id==feature.properties.id))[0];
+    
+          data = data.features.filter(ele=> ele.properties.id!=feature.properties.id);
+          (this.map.getSource('polygon-draw-source') as GeoJSONSource).setData({
+            type:"FeatureCollection",
+            features:data
+          });
+          break;
+      case "LineString":
+
+      data =( this.map.getSource('line-draw-source') as GeoJSONSource)._data;
+      this.currentEditFeature = (data.features.filter(ele=> ele.properties.id==feature.properties.id))[0];
+      data = data.features.filter(ele=> ele.properties.id!=feature.properties.id);
+      (this.map.getSource('line-draw-source') as GeoJSONSource).setData({
+        type:"FeatureCollection",
+        features:data
+      });
+        break;
+        case "Point":
+          data =( this.map.getSource('point-draw-source') as GeoJSONSource)._data;
+          this.currentEditFeature = (data.features.filter(ele=> ele.properties.id==feature.properties.id))[0];    
+          data = data.features.filter(ele=> ele.properties.id!=feature.properties.id);
+          (this.map.getSource('point-draw-source') as GeoJSONSource).setData({
+            type:"FeatureCollection",
+            features:data
+          });
+        break
+        default:
+        break;
+      }
+
+
+
+      this.draw.deleteAll();
+      this.isEditing=true;
+      this.draw.add(this.currentEditFeature);
+      featureOptionPopup.remove()
+
+    });
+
+    let infoButton = document.createElement('button')
+    infoButton.innerHTML = "Info"
+    infoButton.addEventListener('click', () => {
+      featureOptionPopup.remove()
+
+    });
+
+    let propertiesButton = document.createElement('button')
+    propertiesButton.innerHTML = "Properties"
+    propertiesButton.addEventListener('click', () => {
+      console.log(feature.properties);
+
+      featureOptionPopup.remove()
+
+    });
+
+    let deleteButton = document.createElement('button')
+    deleteButton.innerHTML = "Delete"
+    deleteButton.addEventListener('click', () => {
+
+      switch (feature.geometry.type) {
+        case "Polygon":
+          let polygonData:any =( this.map.getSource('polygon-draw-source') as GeoJSONSource)._data;
+          polygonData=  polygonData.features.filter(ele=>   ele.properties.id!=feature.properties.id);
+            (this.map.getSource('polygon-draw-source') as GeoJSONSource).setData({
+              type:"FeatureCollection",
+              features:polygonData
+            });
+            featureOptionPopup.remove()
+          break;
+          case "LineString":
+            let lineData:any =( this.map.getSource('line-draw-source') as GeoJSONSource)._data;
+            lineData=  lineData.features.filter(ele=>   ele.properties.id!=feature.properties.id);
+              (this.map.getSource('line-draw-source') as GeoJSONSource).setData({
+                type:"FeatureCollection",
+                features:lineData
+              });
+              featureOptionPopup.remove()
+          break;
+          case "Point":
+            let pointData:any =( this.map.getSource('point-draw-source') as GeoJSONSource)._data;
+            pointData=  pointData.features.filter(ele=>   ele.properties.id!=feature.properties.id);
+              (this.map.getSource('point-draw-source') as GeoJSONSource).setData({
+                type:"FeatureCollection",
+                features:pointData
+              });
+              featureOptionPopup.remove()
+          break;
+      
+        default:
+          break;
+      }
+
+        featureOptionPopup.remove()
+
+    });
+
+
+    options.className="options-buttons";
+    options.append(editButton,infoButton,propertiesButton,deleteButton);
+
+    let featureOptionPopup = new maplibregl.Popup({
+      closeOnClick:true,
+      closeButton:false,
+      anchor:'left'
+    }).setLngLat(event.lngLat).setDOMContent(options);
+    featureOptionPopup.addClassName('featureOptionsPopup')
+    
+
+    const popups = document.getElementsByClassName("featureOptionsPopup");
+console.log(popups)
+    if (popups.length) {
+      popups[0].remove();
+      featureOptionPopup.addTo(this.map)
+    } else {
+      featureOptionPopup.addTo(this.map)
+    }
+
+    featureOptionPopup.addClassName('featureOptionsPopup')
+
+  }
+
+  onToggleEdit(action:string){
+    let feature =action=='save'? this.draw.getAll().features[0]:this.currentEditFeature;
+    switch (feature.geometry.type) {
+        case 'Polygon':
+          let polygonData:any =( this.map.getSource('polygon-draw-source') as GeoJSONSource)._data;
+          polygonData.features.push(feature);
+          (this.map.getSource('polygon-draw-source') as GeoJSONSource).setData(polygonData);
+          break;
+
+        case "LineString":
+          let lineData:any =( this.map.getSource('line-draw-source') as GeoJSONSource)._data;
+          lineData.features.push(feature);
+          (this.map.getSource('line-draw-source') as GeoJSONSource).setData(lineData);
+        break;
+
+        case "Point":
+          let pointData:any =( this.map.getSource('point-draw-source') as GeoJSONSource)._data;
+          pointData.features.push(feature);
+          (this.map.getSource('point-draw-source') as GeoJSONSource).setData(pointData);
+        break;
+
+        default:
+
+      }
+
+    this.draw.deleteAll();
+    this.isEditing=false;
+
+  }
 
 }

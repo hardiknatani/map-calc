@@ -39,9 +39,6 @@
             </mat-expansion-panel>
 <div class="py-2 px-1" >
 
-           <button mat-raised-button (click)="changeMode()" >Rectangle</button>            
-
-
 </div>
           </div>
 
@@ -83,6 +80,17 @@
 </div>
 
 </div> 
+<div *ngIf="isEditing" class="mapboxgl-ctrl-group mapboxgl-ctrl save-edits-ctrl">
+    <p>Current Edits</p>
+    <div class="save-options-group" >
+      <button  (click)="onToggleEdit('save')" class="mapboxgl-ctrl-icon mapboxgl-save-edits">
+        Save
+      </button>
+      <button (click)="onToggleEdit('cancel')" class="mapboxgl-ctrl-icon mapboxgl-cancel-edits">
+        Cancel
+      </button>
+    </div>
+</div>
 
 
     </div>

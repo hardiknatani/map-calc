@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BlockUIModule } from 'ng-block-ui';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { NgScrollbarModule } from 'ngx-scrollbar';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { HttpClientModule } from '@angular/common/http';
     MaterialModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    FormsModule, ReactiveFormsModule,BlockUIModule.forRoot()
+    FormsModule, ReactiveFormsModule,BlockUIModule.forRoot(),
+    NgScrollbarModule
 
   ],
   providers: [],

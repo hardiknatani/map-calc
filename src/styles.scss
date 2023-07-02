@@ -10,25 +10,20 @@
 @import '../node_modules/tailwindcss/components.css';
 @import '../node_modules/tailwindcss/utilities.css';
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons&display=block');
+@import url('./assets/map-styles.scss');
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-.mapboxgl-tile-boundaries
-{ 
-  background: url('data:image/svg+xml;charset=UTF-8,<svg viewBox="0 0 46 46" width="22px" height="22px" xmlns="http://www.w3.org/2000/svg" ><path d="M40 4h-32c-2.21 0-4 1.79-4 4v32c0 2.21 1.79 4 4 4h32c2.21 0 4-1.79 4-4v-32c0-2.21-1.79-4-4-4zm-24 36h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8zm12 24h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8zm12 24h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8z"></path></svg>');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-}
-
-.mapbox-gl-draw_rectangle{
-  background-image: url('./assets/rectangle.svg');
-}
-
-.mapbox-gl-draw_polygon{
-  background-image: url('./assets/polygon.svg') !important;
-}
-
-.mapbox-gl-draw_circle{
-  background-image: url('./assets/circle.svg') !important;
-}
+*::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: ffffff96;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(220, 215, 215, 0.826);
+    border-radius: 10px;
+    border: 3px solid grey;
+  }
