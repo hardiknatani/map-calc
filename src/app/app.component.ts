@@ -297,7 +297,6 @@ return this.http.get(url)
             feature['properties']['id']=(Math.floor(Math.random() * 900000 + 100000));
             let pointData:any =( this.map.getSource('point-draw-source') as GeoJSONSource)._data;
             pointData.features.push(feature);
-            console.log(pointData);
             (this.map.getSource('point-draw-source') as GeoJSONSource).setData(pointData);
 
 
@@ -306,17 +305,20 @@ return this.http.get(url)
           default:
 
         }
-        console.log(feature)
 
-        this.draw.deleteAll()
+        this.draw.delete(feature.id)
     });
 
       this.map.on('contextmenu',(event)=>{
+
+        if(this.isEditing){
+          return
+        }
+
       let selectedFeatures =  this.map.queryRenderedFeatures(event.point);
       let drawFeatures = selectedFeatures.filter(feature=>(feature.source=='polygon-draw-source' || feature.source=='line-draw-source' || feature.source=='point-draw-source') )
       if (drawFeatures && drawFeatures.length > 0) {
         let feature = drawFeatures[0];
-        console.log(feature)
         this.addFeatureOptionPopup(event,feature)
 
       }});
@@ -384,7 +386,6 @@ return this.http.get(url)
 
 
   addFeatureOptionPopup(event,feature){
-    console.log(feature)
     let options = document.createElement('div');
 
     let editButton = document.createElement('button')
@@ -431,7 +432,7 @@ return this.http.get(url)
 
       this.draw.deleteAll();
       this.isEditing=true;
-      this.draw.add(this.currentEditFeature);
+      this.draw.changeMode('direct_select',{featureId:this.draw.add(this.currentEditFeature)[0]})
       featureOptionPopup.remove()
 
     });
@@ -446,7 +447,6 @@ return this.http.get(url)
     let propertiesButton = document.createElement('button')
     propertiesButton.innerHTML = "Properties"
     propertiesButton.addEventListener('click', () => {
-      console.log(feature.properties);
 
       featureOptionPopup.remove()
 
@@ -506,7 +506,6 @@ return this.http.get(url)
     
 
     const popups = document.getElementsByClassName("featureOptionsPopup");
-console.log(popups)
     if (popups.length) {
       popups[0].remove();
       featureOptionPopup.addTo(this.map)
