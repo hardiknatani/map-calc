@@ -8,11 +8,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BlockUIModule } from 'ng-block-ui';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { NgScrollbarModule } from 'ngx-scrollbar';
+import { EditableTableComponent } from './editable-table/editable-table.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    EditableTableComponent
   ],
   imports: [
     BrowserModule,
@@ -20,9 +21,9 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
     MaterialModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    FormsModule, ReactiveFormsModule,BlockUIModule.forRoot(),
-    NgScrollbarModule
-
+    FormsModule,
+     ReactiveFormsModule
+    ,BlockUIModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
