@@ -33,7 +33,7 @@ export class AppComponent implements OnInit,AfterViewInit,OnDestroy {
 
   @ViewChild('map', { static: true }) private mapContainer!: ElementRef<HTMLElement>;
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
-
+  selectedTab:any;
   // @BlockUI() blockUI: NgBlockUI;
   mapControls: any;
   showFiller = false;
@@ -74,6 +74,7 @@ createTileKey(tileIndex) {
 
 isEditing=false;
 currentEditFeature:any;
+currentPropertiesFeature:any;
 
   constructor(private dialog: MatDialog, private fb: FormBuilder, private bottomSheet: MatBottomSheet, private http: HttpClient) { ; }
 
@@ -448,6 +449,11 @@ return this.http.get(url)
     propertiesButton.innerHTML = "Properties"
     propertiesButton.addEventListener('click', () => {
 
+      !this.sidenav.opened && this.sidenav.open();
+
+      this.selectedTab=2;
+      this.currentPropertiesFeature = feature.properties
+
       featureOptionPopup.remove()
 
     });
@@ -545,6 +551,11 @@ return this.http.get(url)
     this.draw.deleteAll();
     this.isEditing=false;
 
+  }
+
+
+  onPropertiesChanged(e){
+console.log(e)
   }
 
 }

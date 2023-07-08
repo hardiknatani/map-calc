@@ -1,0 +1,133 @@
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { FormGroup, FormBuilder, FormControl, FormArray } from '@angular/forms';
+import { MatTableDataSource } from '@angular/material/table';
+
+
+export interface PeriodicElement {
+  property: string;
+  value: number;
+
+}
+
+const ELEMENT_DATA: PeriodicElement[] = [
+
+];
+
+@Component({
+  selector: 'app-editable-table',
+  templateUrl: './editable-table.component.html',
+  styleUrls: ['./editable-table.component.scss']
+})
+
+
+export class EditableTableComponent implements OnInit,OnChanges {
+
+  @Input() properties:any;
+  @Output() propertiesChanged = new EventEmitter<any>();
+
+  displayedColumns: string[] = ['property','value'];
+  dataSource = new MatTableDataSource<any>();
+ 
+ isLoading = true;
+ 
+ pageNumber: number = 1;
+   VOForm: FormGroup;
+   isEditableNew: boolean = true;
+   constructor(
+     private fb: FormBuilder,
+     private _formBuilder: FormBuilder){}
+ 
+   ngOnInit(): void {
+
+    console.log(this.properties)
+     this.VOForm = this._formBuilder.group({
+       VORows: this._formBuilder.array([])
+     });
+ 
+      this.VOForm = this.fb.group({
+               VORows: this.fb.array(ELEMENT_DATA.map(val => this.fb.group({
+                 property: new FormControl(val.property),
+                 value: new FormControl(val.value),
+ 
+               })
+               )) //end of fb array
+             }); // end of form group cretation
+     this.isLoading = false;
+     this.dataSource = new MatTableDataSource((this.VOForm.get('VORows') as FormArray).controls);
+ 
+     this.VOForm.valueChanges.subscribe(data=>{
+      this.propertiesChanged.emit(data)
+     })
+ 
+   }
+ 
+ 
+ 
+   ngAfterViewInit() {
+ 
+   }
+
+   ngOnChanges(changes: SimpleChanges): void {
+
+   let properties =  changes['properties']['currentValue'];
+   const control = this.VOForm.get('VORows') as FormArray;
+
+   while(control.length!=0){
+    control.removeAt(0)
+   }
+
+   Object.entries(properties).forEach(ele=>{
+    control.push(this.fb.group({
+    property: new FormControl(ele[0]),
+    value: new FormControl(ele[1]),
+    }));
+   });
+
+   this.dataSource = new MatTableDataSource(control.controls)
+
+  }
+   
+ 
+   AddNewRow() {
+ 
+     const control = this.VOForm.get('VORows') as FormArray;
+     control.insert(0,this.initiateVOForm());
+     this.dataSource = new MatTableDataSource(control.controls)
+ 
+   }
+ 
+   // this function will enabled the select field for editd
+   EditSVO(VOFormElement, i) {
+ 
+     // VOFormElement.get('VORows').at(i).get('name').disabled(false)
+     VOFormElement.get('VORows').at(i).get('isEditable').patchValue(false);
+     // this.isEditableNew = true;
+ 
+   }
+ 
+   // On click of correct button in table (after click on edit) this method will call
+   SaveVO(VOFormElement, i) {
+     // alert('SaveVO')
+     VOFormElement.get('VORows').at(i).get('isEditable').patchValue(true);
+   }
+ 
+   // On click of cancel button in the table (after click on edit) this method will call and reset the previous data
+   CancelSVO(VOFormElement, i) {
+     VOFormElement.get('VORows').at(i).get('isEditable').patchValue(true);
+   }
+ 
+ 
+ idx: number;
+ 
+ 
+ 
+   initiateVOForm(): FormGroup {
+     return this.fb.group({
+ 
+       property: new FormControl(""),
+      value: new FormControl(''),
+ 
+     });
+   }
+ 
+}

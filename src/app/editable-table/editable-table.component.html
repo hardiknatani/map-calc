@@ -1,0 +1,37 @@
+<div class="mat-elevation-z8">
+
+  <br />
+
+  <form [formGroup]="VOForm" autocomplete="off">
+    <ng-container formArrayName="VORows">
+      <table #table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="property">
+          <th mat-header-cell *matHeaderCellDef>Property</th>
+          <td mat-cell *matCellDef="let element; let i = index" [formGroup]="element">
+            <div class="px-2 py-1">
+              <input matInput type="text" formControlName="property" />
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="value">
+          <th mat-header-cell *matHeaderCellDef>Value</th>
+          <td mat-cell *matCellDef="let element; let i = index" [formGroup]="element">
+            <div class="px-2 py-1">
+              <input matInput type="text" formControlName="value" />
+            </div>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      </table>
+    </ng-container>
+  </form>
+  <mat-card *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center">
+  </mat-card>
+  <br>
+  <button>
+    <mat-icon (click)="AddNewRow()" class="add-button">add_box</mat-icon>
+  </button>
+</div>

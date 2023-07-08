@@ -7,36 +7,12 @@
       </button>
     </div>
 
-  <mat-tab-group animationDuration="200ms" mat-stretch-tabs    >
-    <mat-tab label="Layers"> 
+  <mat-tab-group animationDuration="200ms" mat-stretch-tabs [(selectedIndex)]="selectedTab"    >
+    <mat-tab label="Features"> 
   
         <div class="layers-sidebar  px-2" id="layers-sidebar">
           <div class="inner-Extendent">
   
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title class="font-semibold" >
-                  Layers
-               </mat-panel-title>
-              </mat-expansion-panel-header>
-              <div *ngFor="let layer of borderAndAreasLayers">
-                <div class="matlistitem">
-                  <div>
-                    {{layer.name}}
-                  </div>
-                  <div class="flex flex-row justify-between items-center" >
-
-                  <button matRipple class=" flex flex-row justify-between rounded-full" (click)="handleLayerVisibility(layer,true)" >
-                    <mat-icon *ngIf="layer.active">visibility</mat-icon>
-                    <mat-icon *ngIf="!layer.active">visibility_off</mat-icon>
-                  </button>
-                  <button matRipple class=" flex flex-row justify-between rounded-full" (click)=" showSettings(layer)">
-                    <mat-icon >settings</mat-icon>
-                  </button>
-                  </div>
-                </div>
-              </div>
-            </mat-expansion-panel>
 <div class="py-2 px-1" >
 
 </div>
@@ -45,8 +21,9 @@
         </div>
 
     </mat-tab>
-    <mat-tab label="Settings">  </mat-tab>
-  
+    <mat-tab label="Properties"> 
+      <app-editable-table [properties]="currentPropertiesFeature" (propertiesChanged)="onPropertiesChanged($event)"  ></app-editable-table>
+    </mat-tab>
   </mat-tab-group>
 
 
