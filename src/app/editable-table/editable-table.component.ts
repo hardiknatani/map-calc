@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 
 export interface PeriodicElement {
@@ -25,7 +26,7 @@ export class EditableTableComponent implements OnInit,OnChanges {
   @Input() properties:any;
   @Output() propertiesChanged = new EventEmitter<any>();
 
-  displayedColumns: string[] = ['property','value'];
+  displayedColumns: string[] = ['property','value',"actions"];
   dataSource = new MatTableDataSource<any>();
  
  isLoading = true;
@@ -39,7 +40,6 @@ export class EditableTableComponent implements OnInit,OnChanges {
  
    ngOnInit(): void {
 
-    console.log(this.properties)
      this.VOForm = this._formBuilder.group({
        VORows: this._formBuilder.array([])
      });
@@ -55,7 +55,9 @@ export class EditableTableComponent implements OnInit,OnChanges {
      this.isLoading = false;
      this.dataSource = new MatTableDataSource((this.VOForm.get('VORows') as FormArray).controls);
  
-     this.VOForm.valueChanges.subscribe(data=>{
+     this.VOForm.valueChanges.pipe(  
+      debounceTime(200),
+     distinctUntilChanged()).subscribe(data=>{
       this.propertiesChanged.emit(data)
      })
  
@@ -70,21 +72,23 @@ export class EditableTableComponent implements OnInit,OnChanges {
    ngOnChanges(changes: SimpleChanges): void {
 
    let properties =  changes['properties']['currentValue'];
-   const control = this.VOForm.get('VORows') as FormArray;
 
-   while(control.length!=0){
-    control.removeAt(0)
-   }
+ if(this.VOForm && this.VOForm.controls){
+  const control = this.VOForm.get('VORows') as FormArray;
 
-   Object.entries(properties).forEach(ele=>{
-    control.push(this.fb.group({
-    property: new FormControl(ele[0]),
-    value: new FormControl(ele[1]),
-    }));
-   });
+  while(control.length!=0){
+   control.removeAt(0)
+  }
 
-   this.dataSource = new MatTableDataSource(control.controls)
+  Object.entries(properties).forEach(ele=>{
+   control.push(this.fb.group({
+   property: new FormControl(ele[0]),
+   value: new FormControl(ele[1]),
+   }));
+  });
 
+  this.dataSource = new MatTableDataSource(control.controls)
+ }
   }
    
  
@@ -117,7 +121,11 @@ export class EditableTableComponent implements OnInit,OnChanges {
    }
  
  
- idx: number;
+deleteRow(i){
+  (this.VOForm.get('VORows') as FormArray).removeAt(i);
+    const control = this.VOForm.get('VORows') as FormArray;
+  this.dataSource = new MatTableDataSource(control.controls)
+}
  
  
  

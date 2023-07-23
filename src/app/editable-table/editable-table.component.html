@@ -1,37 +1,51 @@
-<div class="mat-elevation-z8">
-
-  <br />
+<div class="px-2 py-2">
+  <div class=" mb-2 flex flex-row-reverse">
+    <button mat-raised-button (click)="AddNewRow()">
+      Add Row
+    </button>
+  </div>
+  <!-- <br /> -->
 
   <form [formGroup]="VOForm" autocomplete="off">
-    <ng-container formArrayName="VORows">
-      <table #table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-        <ng-container matColumnDef="property">
-          <th mat-header-cell *matHeaderCellDef>Property</th>
-          <td mat-cell *matCellDef="let element; let i = index" [formGroup]="element">
-            <div class="px-2 py-1">
-              <input matInput type="text" formControlName="property" />
-            </div>
-          </td>
-        </ng-container>
+    <div class="p-2 bg-white w-full">
+      <ng-container formArrayName="VORows">
+        <table #table mat-table [dataSource]="dataSource">
+          <ng-container matColumnDef="property">
+            <th style="text-align: center !important;" mat-header-cell *matHeaderCellDef>Property</th>
+            <td class="border-gray-100 cursor-text bg-slate-400" (click)="propertyInput.click()" mat-cell
+              *matCellDef="let element; let i = index" [formGroup]="element">
+              <div class="h-full w-full">
+                <input #propertyInput matInput type="text" formControlName="property" />
+              </div>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="value">
-          <th mat-header-cell *matHeaderCellDef>Value</th>
-          <td mat-cell *matCellDef="let element; let i = index" [formGroup]="element">
-            <div class="px-2 py-1">
-              <input matInput type="text" formControlName="value" />
-            </div>
-          </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <ng-container matColumnDef="value">
+            <th style="text-align: center !important;" mat-header-cell *matHeaderCellDef>Value</th>
+            <td class="border-gray-100 border cursor-text " (click)="valueInput.click()" mat-cell
+              *matCellDef="let element; let i = index" [formGroup]="element">
+              <div class="h-full w-full">
+                <input #valueInput matInput type="text" formControlName="value" />
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th style="text-align: center !important;" mat-header-cell *matHeaderCellDef>Actions</th>
+            <td style="border: none !important;" class=" cursor-text align-middle" mat-cell
+              *matCellDef="let element; let i = index" [formGroup]="element">
+              <button (click)="deleteRow(i)">
+                <mat-icon  >delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <!-- <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr> -->
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-      </table>
-    </ng-container>
+        </table>
+      </ng-container>
+    </div>
   </form>
   <mat-card *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center">
   </mat-card>
   <br>
-  <button>
-    <mat-icon (click)="AddNewRow()" class="add-button">add_box</mat-icon>
-  </button>
 </div>

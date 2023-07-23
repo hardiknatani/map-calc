@@ -22,7 +22,7 @@
 
     </mat-tab>
     <mat-tab label="Properties"> 
-      <app-editable-table [properties]="currentPropertiesFeature" (propertiesChanged)="onPropertiesChanged($event)"  ></app-editable-table>
+      <app-editable-table [properties]="currentPropertiesFeature.properties" (propertiesChanged)="onPropertiesChanged($event)"  ></app-editable-table>
     </mat-tab>
   </mat-tab-group>
 

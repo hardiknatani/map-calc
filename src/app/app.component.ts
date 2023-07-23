@@ -12,7 +12,7 @@ import { InspectControl } from 'mapbox-gl-controls';
 import { IControl, GeoJSONSource, Map } from 'maplibre-gl';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { lastValueFrom } from 'rxjs';
-import { API_KEY, basemaps, borderAndAreasLayers, colormaps } from './shared/map.common';
+import { API_KEY, basemaps, borderAndAreasLayers, colormaps, transparentIcon } from './shared/map.common';
 import * as maplibregl from 'maplibre-gl';
 import { environment } from '../environments/environment';
 import TileBoundariesControl from './shared/maplibre-custom-controls/TileBoundariesControl';
@@ -74,7 +74,9 @@ createTileKey(tileIndex) {
 
 isEditing=false;
 currentEditFeature:any;
-currentPropertiesFeature:any;
+currentPropertiesFeature:any={
+  properties:{}
+};
 
   constructor(private dialog: MatDialog, private fb: FormBuilder, private bottomSheet: MatBottomSheet, private http: HttpClient) { ; }
 
@@ -248,7 +250,7 @@ return this.http.get(url)
 
   initMap() {
 
-    const initialState = { lng: 5.339355468750009, lat:60.02369688198334, zoom: 9 };
+    const initialState = { lng: 5.339355468750009, lat:60.02369688198334, zoom: 1 };
 
     this.map = new Map({
       container: this.mapContainer.nativeElement,
@@ -259,11 +261,15 @@ return this.http.get(url)
       attributionControl:false,
     });
 
-    let inspectControl: IControl = ((new InspectControl() as any) as IControl)
+    let inspectControl: IControl = ((new InspectControl({console:true}) as any) as IControl)
     this.map.addControl(inspectControl)
     this.map.addControl(this.draw);
     this.map.addControl (new TileBoundariesControl());
     // this.map.addControl(new SaveEditsControl());
+    //to-do test
+    // pass geometry in save edit control
+        // this.map.addControl(new SaveEditsControl(geometry));
+
     let that = this
 
 
@@ -380,6 +386,11 @@ return this.http.get(url)
 
       })
 
+      this.map.on('styleimagemissing',  (e)=> {
+        var id = e.id; 
+        
+        this.map.addImage(id, transparentIcon());
+        });
 
   }
 
@@ -452,8 +463,7 @@ return this.http.get(url)
       !this.sidenav.opened && this.sidenav.open();
 
       this.selectedTab=2;
-      this.currentPropertiesFeature = feature.properties
-
+      this.currentPropertiesFeature = feature
       featureOptionPopup.remove()
 
     });
@@ -495,7 +505,9 @@ return this.http.get(url)
           break;
       }
 
-        featureOptionPopup.remove()
+        featureOptionPopup.remove();
+
+        // to-do handle properties tab when feature delete 
 
     });
 
@@ -545,6 +557,7 @@ return this.http.get(url)
         break;
 
         default:
+          break;
 
       }
 
@@ -555,7 +568,64 @@ return this.http.get(url)
 
 
   onPropertiesChanged(e){
-console.log(e)
+
+if(this.currentPropertiesFeature.geometry==undefined){
+  return
+}
+
+let properties ={};
+e.VORows.forEach(row=>{
+  properties[row['property']]=row.value
+})
+
+
+let feature ={
+  "type": "Feature",
+  "geometry":this.currentPropertiesFeature._geometry ,
+  "properties": properties
+}
+
+let index;
+
+switch (this.currentPropertiesFeature.geometry.type) {
+  case 'Polygon':
+    let polygonData:any =( this.map.getSource('polygon-draw-source') as GeoJSONSource)._data;
+     index =   polygonData.features.findIndex(f=>f.properties.id==this.currentPropertiesFeature.properties.id);
+    polygonData.features.splice(index,1,feature); 
+
+    setTimeout(() => {
+      feature.geometry = this.currentPropertiesFeature._geometry ;
+      (this.map.getSource('polygon-draw-source') as GeoJSONSource).setData(polygonData);
+    }, 1000);
+    break;
+
+  case "LineString":
+    let lineData:any =( this.map.getSource('line-draw-source') as GeoJSONSource)._data;
+     index =   lineData.features.findIndex(f=>f.properties.id==this.currentPropertiesFeature.properties.id);
+    lineData.features.splice(index,1,feature); 
+
+    setTimeout(() => {
+      feature.geometry = this.currentPropertiesFeature._geometry ;
+      (this.map.getSource('polygon-draw-source') as GeoJSONSource).setData(lineData);
+    }, 100);
+  break;
+
+  case "Point":
+    let pointData:any =( this.map.getSource('point-draw-source') as GeoJSONSource)._data;
+     index =   pointData.features.findIndex(f=>f.properties.id==this.currentPropertiesFeature.properties.id);
+    pointData.features.splice(index,1,feature); 
+
+    setTimeout(() => {
+      feature.geometry = this.currentPropertiesFeature._geometry ;
+      (this.map.getSource('point-draw-source') as GeoJSONSource).setData(pointData);
+    }, 100);
+  break;
+
+  default:
+      break;
+}
+
+
   }
 
 }

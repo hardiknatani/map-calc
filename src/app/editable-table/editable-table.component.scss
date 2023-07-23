@@ -1,5 +1,37 @@
 table {
     width: 100%;
+    padding: 0;
+
+    td{
+      border: 1px solid rgb(142 142 142) !important;
+      padding: 0 !important;
+
+      >div{
+        display: flex;
+        flex-direction: row;
+        outline: none;
+        width: 100% !important;
+        height:25px !important;
+      }
+
+    }
+
+
+    input{
+  
+      height:inherit;
+      background-color: inherit;
+      border-radius: 5px;
+      outline: none;
+      text-indent: 10px;
+    }
   }
   
+
+  tr.mat-mdc-row {
+    // border: 1px solid #e7e7e7;
+    font-weight: bold;
+    height: 20px !important;
+}
+
 
