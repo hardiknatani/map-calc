@@ -1,5 +1,5 @@
 <mat-sidenav-container [hasBackdrop]="false" autoSize>
-  <mat-sidenav #sidenav opened mode="over" [disableClose]="true" class="p-0  w-fit transparent">
+  <mat-sidenav #sidenav opened mode="over" [disableClose]="true" class="p-0  w-fit">
     <div class="absolute  top-2 -right-12 z-9999 "  >
       <button mat-mini-fab class="bg-white" (click)="sidenav.toggle()">
         <mat-icon *ngIf="sidenav.opened">layers_clear</mat-icon>
@@ -7,22 +7,20 @@
       </button>
     </div>
 
-  <mat-tab-group animationDuration="200ms" mat-stretch-tabs [(selectedIndex)]="selectedTab"    >
-    <mat-tab label="Features"> 
-  
-        <div class="layers-sidebar  px-2" id="layers-sidebar">
-          <div class="inner-Extendent">
-  
-<div class="py-2 px-1" >
-
-</div>
-          </div>
-
-        </div>
-
+  <mat-tab-group  animationDuration="200ms" mat-stretch-tabs [(selectedIndex)]="selectedTab">
+    <mat-tab label="Features">
+      <div class=" bg-white">
+          <ngx-codemirror #codeMirror  #codemirror
+          [options]="codeMirrorOptions"
+          [(ngModel)]="geojsonText"
+          (codeMirrorLoaded)="codeMirrorLoaded()"
+          (ngModelChange)="setEditorContent($event)">
+        </ngx-codemirror>
+      </div>
     </mat-tab>
-    <mat-tab label="Properties"> 
-      <app-editable-table [properties]="currentPropertiesFeature.properties" (propertiesChanged)="onPropertiesChanged($event)"  ></app-editable-table>
+    <mat-tab  label="Properties" >
+      <app-editable-table [properties]="currentPropertiesFeature.properties"
+        (propertiesChanged)="onPropertiesChanged($event)"></app-editable-table>
     </mat-tab>
   </mat-tab-group>
 

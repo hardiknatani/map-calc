@@ -9,6 +9,7 @@ import { BlockUIModule } from 'ng-block-ui';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { EditableTableComponent } from './editable-table/editable-table.component';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { EditableTableComponent } from './editable-table/editable-table.componen
     HttpClientModule,
     FormsModule,
      ReactiveFormsModule
-    ,BlockUIModule.forRoot()
+    ,BlockUIModule.forRoot(),
+    CodemirrorModule
   ],
   providers: [],
   bootstrap: [AppComponent]

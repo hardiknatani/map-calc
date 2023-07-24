@@ -9,10 +9,12 @@
 @import '../node_modules/tailwindcss/base.css';
 @import '../node_modules/tailwindcss/components.css';
 @import '../node_modules/tailwindcss/utilities.css';
+@import '../node_modules/codemirror/lib/codemirror';
+@import '../node_modules/codemirror/theme/material';
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons&display=block');
 @import url('./assets/map-styles.scss');
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body { height: 100%;   margin: 0;}
+body { font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 *::-webkit-scrollbar {
     width: 5px;
