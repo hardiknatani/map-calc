@@ -14,7 +14,7 @@
           [options]="codeMirrorOptions"
           [(ngModel)]="geojsonText"
           (codeMirrorLoaded)="codeMirrorLoaded()"
-          (ngModelChange)="setEditorContent($event)">
+          (ngModelChange)="handleChange($event)">
         </ngx-codemirror>
       </div>
     </mat-tab>

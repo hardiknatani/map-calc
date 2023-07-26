@@ -11,6 +11,9 @@
 @import '../node_modules/tailwindcss/utilities.css';
 @import '../node_modules/codemirror/lib/codemirror';
 @import '../node_modules/codemirror/theme/material';
+@import '../node_modules/codemirror/addon/lint/lint.css';
+@import '../node_modules/codemirror/addon/fold/foldgutter.css';
+
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons&display=block');
 @import url('./assets/map-styles.scss');
 html, body { height: 100%;   margin: 0;}

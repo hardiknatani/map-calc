@@ -1,6 +1,6 @@
 import { formatNumber } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,7 +23,11 @@ import  DrawRectangle from './shared/draw-custom-modes/rectangle/rectangle';
 import DragCirceMode from './shared/draw-custom-modes/circle/modes/DragCircleMode';
 import StaticMode from './shared/draw-custom-modes/static/Static'
 import SaveEditsControl from './shared/maplibre-custom-controls/EditSaveControl';
-import  CodeMirror from 'codemirror/lib/codemirror'
+import * as geojsonhint from '@mapbox/geojsonhint/geojsonhint'
+import {select} from 'd3-selection';
+
+import  CodeMirror, {Editor,EditorFromTextArea, EditorConfiguration } from 'codemirror';
+import {normalize,validate} from './geojsonHelpers'
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -34,7 +38,7 @@ export class AppComponent implements OnInit,AfterViewInit,OnDestroy {
 
   @ViewChild('map', { static: true }) private mapContainer!: ElementRef<HTMLElement>;
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
-  @ViewChild('codeMirror', { static: true }) codeMirror!: any;
+  @ViewChild('codeMirror', { static: true }) editor!: Editor;
 
   selectedTab:any;
   // @BlockUI() blockUI: NgBlockUI;
@@ -82,16 +86,18 @@ currentPropertiesFeature:any={
 };
 
 codeMirrorOptions:any = {
-  mode: "javascript",
+  mode: {name:"javascript",json:true},
   indentWithTabs: true,
   smartIndent: true,
   lineNumbers: true,
   lineWrapping: false,
   extraKeys: { "Ctrl-Space": "autocomplete" },
-  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  foldGutter: true,
+  gutters: ['error','CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+  value:"",
   autoCloseBrackets: true,
   matchBrackets: true,
-  lint: true
+  theme:'eclipse'
 };
 
 geojsonText=`    {
@@ -687,9 +693,9 @@ geojsonText=`    {
       ]
     ]
   }
-},`
+}`
 
-  constructor(private dialog: MatDialog, private fb: FormBuilder, private bottomSheet: MatBottomSheet, private http: HttpClient) { 
+  constructor(private dialog: MatDialog, private fb: FormBuilder, private bottomSheet: MatBottomSheet, private http: HttpClient,private cdr:ChangeDetectorRef) { 
 
   }
 
@@ -893,7 +899,6 @@ return this.http.get(url)
 
       this.map.on('zoom',(e)=>{
         (document.getElementById('zoom-info') as any).innerHTML ='<b>Zoom</b>: '+Number(this.map.getZoom()).toFixed(2)
-
       });
 
       this.map.on('draw.create',(e)=>{
@@ -1241,12 +1246,18 @@ switch (this.currentPropertiesFeature.geometry.type) {
 
   }
 
-  setEditorContent(e){
-    console.log(e)
-  }
 
   codeMirrorLoaded(){
-   this.codeMirror.codeMirror.setSize(null,'auto');
+    this.editor =(this.editor as any).codeMirror
+   this.editor.setSize(null,'auto');
   }
+
+  handleChange(e){
+    if(!e.length)
+    return
+    let value = e;
+    validate(value,this.editor)
+  }
+
 
 }
