@@ -1,7 +1,5 @@
 import * as geojsonhint from '@mapbox/geojsonhint/geojsonhint'
 import {select} from 'd3-selection';
-import {EditorView, keymap} from "@codemirror/view"
-import {jsonParseLinter} from '@codemirror/lang-json'
 
 // export default class GeojsonHelpers{
 
