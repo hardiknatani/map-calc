@@ -9,13 +9,31 @@
 
   <mat-tab-group  animationDuration="200ms" mat-stretch-tabs [(selectedIndex)]="selectedTab">
     <mat-tab label="Features">
-      <div class=" bg-white">
+      <div [ngStyle]="{display: panelStructure=='json' ? 'block' : 'none'}"
+        class=" bg-white  " style="height: 95%;">
           <ngx-codemirror #codeMirror  #codemirror
           [options]="codeMirrorOptions"
           [(ngModel)]="geojsonText"
           (codeMirrorLoaded)="codeMirrorLoaded()"
           (ngModelChange)="handleChange($event)">
         </ngx-codemirror>
+      </div>
+      <div [ngStyle]="{display: panelStructure=='list' ? 'block' : 'none'}"  class=" bg-white  " style="height: 95%;">
+        <div *ngFor="let feature of listFeatures;" class=" hover:bg-gray-200 px-2 py-1 "   (click)="selectFeature(feature,$event)"  [class.highlighted]="selection.isSelected(feature)"  >
+          <span class="ml-3">
+            {{feature.geometry.type | titlecase}}
+          </span>
+        </div>
+      </div>
+      <div class=" border border-red-500 p-2 w-full h-fit fixed bottom-0  flex items-center" style="height:5%; width: 25vw;" >
+      <div>
+        <span>
+          List
+        </span>
+        <mat-slide-toggle  (change)="onPanelStructureChanged($event)" color="primary">
+      </mat-slide-toggle>
+      JSON
+      </div>
       </div>
     </mat-tab>
     <mat-tab  label="Properties" >

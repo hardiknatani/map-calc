@@ -25,6 +25,8 @@ import SaveEditsControl from './shared/maplibre-custom-controls/EditSaveControl'
 import  {Editor,} from 'codemirror';
 import { normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
+import * as turf from '@turf/turf'
+import { SelectionModel } from '@angular/cdk/collections';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -107,6 +109,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   "features": []
 } `;
 
+  listFeatures:any[]=[];  
+
+panelStructure:'list'|'json' =  'list'
+selection = new SelectionModel<any>(true, []);
+
   constructor(
     private dialog: MatDialog,
     private fb: FormBuilder,
@@ -152,6 +159,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     drawCtrl.appendChild(circleButton);
+
+
   }
   ngOnDestroy() {
     if (this.bottomSheet._openedBottomSheetRef) {
@@ -319,10 +328,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       feature['properties'][PROPERTIES.MAPCALC_ID] = Math.floor( Math.random() * 900000 + 100000);
       data.features.push(feature);
       (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
-
       this.draw.delete(feature.id);
 
-      this.updateEditorGeojson()
+      this.updatePanel()
     });
 
     this.map.on('contextmenu', (event) => {
@@ -385,6 +393,33 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         filter: ['==', ['geometry-type'], 'Point'],
       });
+
+      this.map.addSource("selection-source",{
+        type:'geojson',
+        data:{
+        type:"FeatureCollection",
+        features:[]
+      }});
+        this.map.addLayer({
+          'id': 'selection-polygon',
+          'type': 'fill',
+          'source': 'selection-source',
+          'paint': {
+          'fill-color':  '#F84C4C',
+          "fill-opacity":0.5,
+        'fill-outline-color':'#F84C4C'
+          }
+        })
+        this.map.addLayer({
+          'id': 'selection-line',
+          'type': 'line',
+          'source': 'selection-source',
+          'paint': {
+          'line-color':  '#FFED00',
+          "line-opacity":0.6,
+        'line-width':2
+          }
+        });
     });
 
     this.map.on('styleimagemissing', (e) => {
@@ -392,6 +427,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.map.addImage(id, transparentIcon());
     });
+
+
   }
 
   addFeatureOptionPopup(event, feature) {
@@ -441,7 +478,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
       data = data.features.filter( (ele) => ele.properties[PROPERTIES.MAPCALC_ID] !==feature.properties[PROPERTIES.MAPCALC_ID]);
       (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData({type: 'FeatureCollection',features: data});
-        this.updateEditorGeojson()
+        this.updatePanel()
       featureOptionPopup.remove();
 
       // to-do handle properties tab when feature delete
@@ -478,7 +515,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.draw.deleteAll();
     this.isEditing = false;
-    this.updateEditorGeojson()
+    this.updatePanel()
   }
 
   onPropertiesChanged(e) {
@@ -511,7 +548,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   codeMirrorLoaded() {
     this.editor = (this.editor as any).codeMirror;
-    this.editor.setSize(null, 'auto');
+    this.editor.setSize("100%", "100%");
   }
 
   handleChange(e) {
@@ -521,6 +558,78 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateEditorGeojson(){
-    this.editor.setValue(JSON.stringify((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data))
+  this.editor.setValue( JSON.stringify((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data,null,2));
+  this.editor.refresh()
   }
+
+  onPanelStructureChanged(e){
+    if(e.checked){
+      this.updateEditorGeojson();
+      this.panelStructure='json';
+      this.cdr.detectChanges()
+    }
+    else{
+      this.panelStructure='list'
+    }
+  }
+
+  updatePanel(){
+    this.listFeatures = ((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data as any).features;
+    this.updateEditorGeojson();
+
+  }
+
+  selectFeature(feature,event){
+    
+    if(event.ctrlKey){
+      this.selection.toggle(feature)
+    }else{
+      this.selection.clear()
+      this.selection.select(feature)
+    }
+
+    this.highlightFeature(this.selection.selected)
+  }
+
+  highlightFeature(features?){
+    let data: any = {
+      'type': 'FeatureCollection',
+      'features': []
+    };
+
+    if (features.length > 0) {
+      features.forEach(feature => {
+        data.features.push(feature);
+      });
+      (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
+      this.map.moveLayer('selection-polygon');
+      this.map.moveLayer('selection-line');
+    }
+  }
+
+  zoomToAndHighlightFeature(features:any , layerId?) {
+    let data: any = {
+      'type': 'FeatureCollection',
+      'features': []
+    };
+
+    if (features.length > 0) {
+      features.forEach(feature => {
+        data.features.push(feature);
+      });
+      (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
+      let bbox: any = turf.bbox(data);
+      this.map.fitBounds((bbox as any), {
+        padding: 5, zoom: 0.5, linear: true, speed: 5, animate: true
+      });
+      this.map.moveLayer('selection-polygon');
+      this.map.moveLayer('selection-line');
+
+
+    }else{
+      (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
+
+    }
+  }
+
 }
