@@ -19,11 +19,17 @@
         </ngx-codemirror>
       </div>
       <div [ngStyle]="{display: panelStructure=='list' ? 'block' : 'none'}"  class=" bg-white  " style="height: 95%;">
-        <div *ngFor="let feature of listFeatures;" class=" hover:bg-gray-200 px-2 py-1 "   (click)="selectFeature(feature,$event)"  [class.highlighted]="selection.isSelected(feature)"  >
+        <div #trigger="matMenuTrigger" [matMenuTriggerFor]="menu" (contextmenu)="onRightClick($event)" *ngFor="let feature of listFeatures;" class=" hover:bg-gray-200 px-2 py-1 "   (click)="selectFeature(feature,$event)"  [class.highlighted]="selection.isSelected(feature)"  >
           <span class="ml-3">
             {{feature.geometry.type | titlecase}}
           </span>
         </div>
+ 
+        <mat-menu  [hasBackdrop]="true" #menu="matMenu" xPosition="after" panelClass="list-options-context-menu" overlayPanelClass="list-options-context-menu">
+          <button mat-menu-item>Item 1</button>
+          <button mat-menu-item>Item 2</button>
+        </mat-menu>
+     
       </div>
       <div class=" border border-red-500 p-2 w-full h-fit fixed bottom-0  flex items-center" style="height:5%; width: 25vw;" >
       <div>

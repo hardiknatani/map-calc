@@ -27,6 +27,7 @@ import { normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
 import { SelectionModel } from '@angular/cdk/collections';
+import {MatMenuTrigger} from '@angular/material/menu'
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -39,6 +40,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private mapContainer!: ElementRef<HTMLElement>;
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
   @ViewChild('codeMirror', { static: true }) editor!: Editor;
+  @ViewChild('trigger') trigger: MatMenuTrigger;
 
   selectedTab: any;
   // @BlockUI() blockUI: NgBlockUI;
@@ -405,10 +407,12 @@ selection = new SelectionModel<any>(true, []);
           'type': 'fill',
           'source': 'selection-source',
           'paint': {
-          'fill-color':  '#F84C4C',
+          'fill-color':  '#FFED00',
           "fill-opacity":0.5,
-        'fill-outline-color':'#F84C4C'
-          }
+        'fill-outline-color':'#FFED00'
+          },
+          filter: ['==', ['geometry-type'], 'Polygon'],
+
         })
         this.map.addLayer({
           'id': 'selection-line',
@@ -418,7 +422,20 @@ selection = new SelectionModel<any>(true, []);
           'line-color':  '#FFED00',
           "line-opacity":0.6,
         'line-width':2
-          }
+          },
+          filter: ['==', ['geometry-type'], 'LineString'],
+        });
+
+        this.map.addLayer({
+          'id': 'selection-symbol',
+          'type': 'symbol',
+          'source': 'selection-source',
+          layout: {
+            'icon-size': 1,
+            'icon-image': 'mapbox-marker-icon-yellow',
+          },
+          filter: ['==', ['geometry-type'], 'Point'],
+
         });
     });
 
@@ -600,11 +617,13 @@ selection = new SelectionModel<any>(true, []);
     if (features.length > 0) {
       features.forEach(feature => {
         data.features.push(feature);
-      });
+      });}
       (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
       this.map.moveLayer('selection-polygon');
       this.map.moveLayer('selection-line');
-    }
+      this.map.moveLayer('selection-symbol');
+
+    
   }
 
   zoomToAndHighlightFeature(features:any , layerId?) {
@@ -630,6 +649,20 @@ selection = new SelectionModel<any>(true, []);
       (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
 
     }
+  }
+
+  onRightClick(e:Event){
+    e.stopPropagation();
+    e.preventDefault();
+    console.log(this.trigger)
+    if(this.trigger.menuOpen){
+      this.trigger.closeMenu();
+    }
+    this.trigger.openMenu()
+  }
+
+  clickOutside(){
+   this.trigger.closeMenu() 
   }
 
 }

@@ -10,11 +10,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { EditableTableComponent } from './editable-table/editable-table.component';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { ClickOutsideDirective } from './shared/clickOutside.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EditableTableComponent
+    EditableTableComponent,ClickOutsideDirective
   ],
   imports: [
     BrowserModule,
