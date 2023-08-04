@@ -1,6 +1,6 @@
 import { formatNumber } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import {AfterViewInit,ChangeDetectorRef,Component,ElementRef,OnDestroy,OnInit,ViewChild,ViewEncapsulation,} from '@angular/core';
+import {AfterViewInit,ChangeDetectorRef,Component,ElementRef,OnDestroy,OnInit,ViewChild,ViewEncapsulation,ViewChildren,QueryList} from '@angular/core';
 import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
@@ -26,8 +26,9 @@ import  {Editor,} from 'codemirror';
 import { normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
-import { SelectionModel } from '@angular/cdk/collections';
 import {MatMenuTrigger} from '@angular/material/menu'
+import { SelectionService } from './selection.service';
+import { FeatureListItemComponent } from './feature-list-item/feature-list-item.component';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -41,6 +42,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
   @ViewChild('codeMirror', { static: true }) editor!: Editor;
   @ViewChild('trigger') trigger: MatMenuTrigger;
+  @ViewChildren(FeatureListItemComponent) alerts: QueryList<FeatureListItemComponent>
 
   selectedTab: any;
   // @BlockUI() blockUI: NgBlockUI;
@@ -114,14 +116,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   listFeatures:any[]=[];  
 
 panelStructure:'list'|'json' =  'list'
-selection = new SelectionModel<any>(true, []);
 
   constructor(
     private dialog: MatDialog,
     private fb: FormBuilder,
     private bottomSheet: MatBottomSheet,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private selectionService:SelectionService
   ) {}
 
   getBoundsFromTitler(layer) {
@@ -162,6 +164,15 @@ selection = new SelectionModel<any>(true, []);
     });
     drawCtrl.appendChild(circleButton);
 
+    this.selectionService.selectionChanged.subscribe((data:any)=>{
+console.log(this.alerts.forEach(ele=>{
+  ele.closeMenu()
+}))
+      console.log(data.selected)
+          this.highlightFeature(data.selected)
+          this.map.triggerRepaint();
+
+    })
 
   }
   ngOnDestroy() {
@@ -596,18 +607,6 @@ selection = new SelectionModel<any>(true, []);
 
   }
 
-  selectFeature(feature,event){
-    
-    if(event.ctrlKey){
-      this.selection.toggle(feature)
-    }else{
-      this.selection.clear()
-      this.selection.select(feature)
-    }
-
-    this.highlightFeature(this.selection.selected)
-  }
-
   highlightFeature(features?){
     let data: any = {
       'type': 'FeatureCollection',
@@ -618,6 +617,7 @@ selection = new SelectionModel<any>(true, []);
       features.forEach(feature => {
         data.features.push(feature);
       });}
+      console.log(data);
       (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
       this.map.moveLayer('selection-polygon');
       this.map.moveLayer('selection-line');
@@ -651,18 +651,5 @@ selection = new SelectionModel<any>(true, []);
     }
   }
 
-  onRightClick(e:Event){
-    e.stopPropagation();
-    e.preventDefault();
-    console.log(this.trigger)
-    if(this.trigger.menuOpen){
-      this.trigger.closeMenu();
-    }
-    this.trigger.openMenu()
-  }
-
-  clickOutside(){
-   this.trigger.closeMenu() 
-  }
 
 }
