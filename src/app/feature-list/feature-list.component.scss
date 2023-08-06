@@ -1,0 +1,17 @@
+.highlighted{
+    background-color:#E2181850 ;
+    color: #fff;
+    }
+    
+ .context-menu-buttons{
+    width: 100%;
+    padding-top:8px;
+    padding-bottom: 8px;
+    background-color:inherit;
+    &:hover{
+
+        background-color:rgb(226 232 240);
+
+    }
+ }   
+

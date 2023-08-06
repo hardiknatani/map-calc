@@ -1,0 +1,17 @@
+<div *ngFor="let feature of features"
+    class=" hover:bg-gray-200 px-2 py-1 feature-list-item"   
+     (contextmenu)="onRightClick(feature,$event)" 
+    (click)="selectFeature(feature,$event)"  
+    [class.highlighted]="selection.isSelected(feature)"  
+    appClickOutside (clickOutside)="onClickOutsideFeature($event)"
+>
+    <span class="ml-3">
+      {{feature.geometry.type | titlecase}}
+    </span>
+  </div>
+
+  <div #menu appClickOutside (clickOutside)="closeMenu()"  class=" bg-slate-100 w-24 h-fit flex flex-col shadow-md" [style.display]="menuVisibility?'block':'none'" > 
+<div class="flex flex-col p">
+    <button *ngFor="let action of contextMenuActions" class="context-menu-buttons" (click)="onContextMenuAction(action.value)" >{{action.viewValue}}</button>
+</div>
+  </div>

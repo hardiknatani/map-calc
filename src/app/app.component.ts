@@ -28,7 +28,6 @@ import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
 import {MatMenuTrigger} from '@angular/material/menu'
 import { SelectionService } from './selection.service';
-import { FeatureListItemComponent } from './feature-list-item/feature-list-item.component';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -42,7 +41,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
   @ViewChild('codeMirror', { static: true }) editor!: Editor;
   @ViewChild('trigger') trigger: MatMenuTrigger;
-  @ViewChildren(FeatureListItemComponent) alerts: QueryList<FeatureListItemComponent>
 
   selectedTab: any;
   // @BlockUI() blockUI: NgBlockUI;
@@ -165,9 +163,7 @@ panelStructure:'list'|'json' =  'list'
     drawCtrl.appendChild(circleButton);
 
     this.selectionService.selectionChanged.subscribe((data:any)=>{
-console.log(this.alerts.forEach(ele=>{
-  ele.closeMenu()
-}))
+
       console.log(data.selected)
           this.highlightFeature(data.selected)
           this.map.triggerRepaint();
@@ -211,7 +207,6 @@ console.log(this.alerts.forEach(ele=>{
           },
         });
       }
-      // });
     }
 
     const visibility = this.map.getLayoutProperty(
@@ -604,7 +599,8 @@ console.log(this.alerts.forEach(ele=>{
   updatePanel(){
     this.listFeatures = ((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data as any).features;
     this.updateEditorGeojson();
-
+    this.cdr.detectChanges()
+    console.log(this.listFeatures)
   }
 
   highlightFeature(features?){

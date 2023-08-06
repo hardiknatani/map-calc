@@ -11,14 +11,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { EditableTableComponent } from './editable-table/editable-table.component';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { ClickOutsideDirective } from './shared/clickOutside.directive';
-import { FeatureListItemComponent } from './feature-list-item/feature-list-item.component';
 import { SelectionService } from './selection.service';
-import { FeatureListContextMenuComponent } from './feature-list-context-menu/feature-list-context-menu.component';
+import { FeatureListComponent } from './feature-list/feature-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EditableTableComponent,ClickOutsideDirective, FeatureListItemComponent, FeatureListContextMenuComponent
+    EditableTableComponent,ClickOutsideDirective, FeatureListComponent
   ],
   imports: [
     BrowserModule,

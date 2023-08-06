@@ -18,14 +18,14 @@ import {
   
     constructor(private elRef: ElementRef) {}
   
-    @HostListener('document:click', ['$event.target'])
-    onClick(target) {
+    @HostListener('document:click', ['$event'])
+    onClick(e) {
       if (!this.captured) {
         return;
       }
   
-      if (!this.elRef.nativeElement.contains(target)) {
-        this.clickOutside.emit();
+      if (!this.elRef.nativeElement.contains(e.target)) {
+        this.clickOutside.emit(e);
       }
     }
   
