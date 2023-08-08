@@ -11,7 +11,7 @@
     <mat-tab label="Features">
       <div [ngStyle]="{display: panelStructure=='json' ? 'block' : 'none'}"
         class=" bg-white  " style="height: 95%;">
-          <ngx-codemirror #codeMirror  #codemirror
+          <ngx-codemirror #codeMirror 
           [options]="codeMirrorOptions"
           [(ngModel)]="geojsonText"
           (codeMirrorLoaded)="codeMirrorLoaded()"
@@ -19,16 +19,10 @@
         </ngx-codemirror>
       </div>
       <div [ngStyle]="{display: panelStructure=='list' ? 'block' : 'none'}"  class=" bg-white  " style="height: 95%;">
-        <app-feature-list [features]="listFeatures" ></app-feature-list>
-      
-<!--  
-        <mat-menu  [hasBackdrop]="true" #menu="matMenu" xPosition="after" panelClass="list-options-context-menu" overlayPanelClass="list-options-context-menu">
-          <button mat-menu-item>Item 1</button>
-          <button mat-menu-item>Item 2</button>t
-        </mat-menu> -->
+          <app-feature-list [features]="listFeatures" ></app-feature-list>
      
       </div>
-      <div class=" border border-red-500 p-2 w-full h-fit fixed bottom-0  flex items-center" style="height:5%; width: 25vw;" >
+      <div class=" border border-slate-200 p-2 w-full h-fit py-2 fixed bottom-0  flex items-center gap-4 shadow-md" style="height:5%; width: 25vw;box-shadow: 0 -5px 10px -5px rgb(226 232 240);background-color: #f7f7f7;" >
       <div>
         <span>
           List
@@ -36,6 +30,12 @@
         <mat-slide-toggle  (change)="onPanelStructureChanged($event)" color="primary">
       </mat-slide-toggle>
       JSON
+      </div>
+      <div>
+        <button color="primary"  class="font-bold px-2 py-1 border bg-purple-300 rounded-md" (click)="importInput.click()"  >
+         + Import 
+        </button>
+        <input #importInput id="importInput" (change)="readFile($event)"   class="invisible hidden" type="file" name="" id="">
       </div>
       </div>
     </mat-tab>

@@ -10,7 +10,7 @@ export class SelectionService {
 
   selection = new SelectionModel<any>(true, []);
 
-  selectionChanged=new Subject()
+  contextMenuAction = new Subject<any>()
 
   constructor() { }
 }

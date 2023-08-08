@@ -36,7 +36,7 @@ export class FeatureListComponent implements OnChanges {
     e.stopPropagation();
     e.preventDefault();
 
-    if(this.selection.selected.length>1){
+    if(this.selection.selected.length>1 &&  this.selection.isSelected(feature) ){
       // show composite menu
     }else{
       this.selectFeature(feature,e);
@@ -46,7 +46,6 @@ export class FeatureListComponent implements OnChanges {
 
 
     this.showMenu(e);
-    this.repositionMenu(e)
   }
 
   selectFeature(feature,event){
@@ -58,7 +57,6 @@ export class FeatureListComponent implements OnChanges {
       this.selection.select(feature)
     }
 
-    this.selectionService.selectionChanged.next(this.selectionService.selection)
   }
 
   
@@ -72,7 +70,6 @@ export class FeatureListComponent implements OnChanges {
     this.menuVisibility=true; 
 
     this.repositionMenu(e)
-    this.selectionService.selectionChanged.next(this.selectionService.selection)
 
   }
 
@@ -103,12 +100,15 @@ export class FeatureListComponent implements OnChanges {
     if(e.target.classList.contains('feature-list-item')){
       return
     }else{
-      this.selection.clear()
+      this.selection.clear(true)
     }
   }
 
-  onContextMenuAction(action){
-    console.log(action)
+  onContextMenuAction(action,e){
+    e.preventDefault();
+    e.stopPropagation();
+    this.selectionService.contextMenuAction.next(action);
+    this.closeMenu()
   }
   
 }

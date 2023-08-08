@@ -30,7 +30,6 @@ import {
     }
   
     ngOnInit() {
-      console.log(this.captured);
       fromEvent(document, 'click', { capture: true })
         .pipe(take(1))
         .subscribe(() => (this.captured = true));

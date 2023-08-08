@@ -12,6 +12,6 @@
 
   <div #menu appClickOutside (clickOutside)="closeMenu()"  class=" bg-slate-100 w-24 h-fit flex flex-col shadow-md" [style.display]="menuVisibility?'block':'none'" > 
 <div class="flex flex-col p">
-    <button *ngFor="let action of contextMenuActions" class="context-menu-buttons" (click)="onContextMenuAction(action.value)" >{{action.viewValue}}</button>
+    <button *ngFor="let action of contextMenuActions" class="context-menu-buttons" (click)="onContextMenuAction(action.value,$event)" >{{action.viewValue}}</button>
 </div>
   </div>

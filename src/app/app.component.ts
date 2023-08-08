@@ -26,7 +26,6 @@ import  {Editor,} from 'codemirror';
 import { normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
-import {MatMenuTrigger} from '@angular/material/menu'
 import { SelectionService } from './selection.service';
 @Component({
   selector: 'app-root',
@@ -40,7 +39,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private mapContainer!: ElementRef<HTMLElement>;
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
   @ViewChild('codeMirror', { static: true }) editor!: Editor;
-  @ViewChild('trigger') trigger: MatMenuTrigger;
+  @ViewChild('importInput', { static: true }) importInput!: ElementRef<HTMLInputElement>;
 
   selectedTab: any;
   // @BlockUI() blockUI: NgBlockUI;
@@ -124,12 +123,6 @@ panelStructure:'list'|'json' =  'list'
     private selectionService:SelectionService
   ) {}
 
-  getBoundsFromTitler(layer) {
-    let url = `${environment.titiler_base_url}/mosaicjson/bounds?url=${layer.url}`;
-    // let url = `http://localhost:8000/bounds?url=${layer.url}`
-
-    return this.http.get(url);
-  }
 
   ngOnInit(): void {
     this.initMap();
@@ -162,13 +155,15 @@ panelStructure:'list'|'json' =  'list'
     });
     drawCtrl.appendChild(circleButton);
 
-    this.selectionService.selectionChanged.subscribe((data:any)=>{
-
-      console.log(data.selected)
-          this.highlightFeature(data.selected)
+    this.selectionService.selection.changed.subscribe((data:any)=>{
+      this.selectionService.selection.selected
+      this.highlightFeature(this.selectionService.selection.selected)
           this.map.triggerRepaint();
 
-    })
+    });
+
+    this.selectionService.contextMenuAction.subscribe(action=>this.onContextMenuAction(action))
+
 
   }
   ngOnDestroy() {
@@ -444,7 +439,7 @@ panelStructure:'list'|'json' =  'list'
 
         });
     });
-
+    
     this.map.on('styleimagemissing', (e) => {
       var id = e.id;
 
@@ -589,6 +584,7 @@ panelStructure:'list'|'json' =  'list'
     if(e.checked){
       this.updateEditorGeojson();
       this.panelStructure='json';
+      this.editor.refresh();
       this.cdr.detectChanges()
     }
     else{
@@ -600,7 +596,6 @@ panelStructure:'list'|'json' =  'list'
     this.listFeatures = ((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data as any).features;
     this.updateEditorGeojson();
     this.cdr.detectChanges()
-    console.log(this.listFeatures)
   }
 
   highlightFeature(features?){
@@ -613,7 +608,6 @@ panelStructure:'list'|'json' =  'list'
       features.forEach(feature => {
         data.features.push(feature);
       });}
-      console.log(data);
       (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
       this.map.moveLayer('selection-polygon');
       this.map.moveLayer('selection-line');
@@ -622,7 +616,7 @@ panelStructure:'list'|'json' =  'list'
     
   }
 
-  zoomToAndHighlightFeature(features:any , layerId?) {
+  zoomTo(features:any[] ) {
     let data: any = {
       'type': 'FeatureCollection',
       'features': []
@@ -632,20 +626,57 @@ panelStructure:'list'|'json' =  'list'
       features.forEach(feature => {
         data.features.push(feature);
       });
-      (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
       let bbox: any = turf.bbox(data);
       this.map.fitBounds((bbox as any), {
-        padding: 5, zoom: 0.5, linear: true, speed: 5, animate: true
+        padding: 5, zoom: 12, linear: true, speed: 5, animate: true
       });
-      this.map.moveLayer('selection-polygon');
-      this.map.moveLayer('selection-line');
-
-
-    }else{
-      (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
-
     }
   }
 
+  readFile(e){
+    let file = (this.importInput.nativeElement.files as any)[0];
+    let that = this
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const fileContent = (event.target as any).result;
+
+      try {
+          const jsonObject = JSON.parse(fileContent);
+         let geojson = normalize(jsonObject);
+         if(geojson.features.length>0){
+          geojson.features.forEach(feature=>{
+            if(!Object.keys(feature).includes('properties')){
+              feature['properties']={
+                mapcalc_id:Math.floor( Math.random() * 900000 + 100000).toString()
+              }
+            }else{
+              feature['properties']['mapcalc_id']=Math.floor( Math.random() * 900000 + 100000).toString()
+            }
+          })
+         }
+          (that.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(geojson);
+          that.updatePanel()
+        } catch (e) {
+          // displayError('Error parsing JSON file.');
+      }
+  };
+  reader.readAsText(file);
+  }
+
+  onContextMenuAction(action){
+  
+    switch (action) {
+      case 'zoom-to':
+          this.zoomTo(this.selectionService.selection.selected)
+        break;
+      case 'delete':
+        
+        break;
+    
+      default:
+        break;
+    }
+
+  }
 
 }
