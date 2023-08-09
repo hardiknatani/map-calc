@@ -156,7 +156,6 @@ panelStructure:'list'|'json' =  'list'
     drawCtrl.appendChild(circleButton);
 
     this.selectionService.selection.changed.subscribe((data:any)=>{
-      this.selectionService.selection.selected
       this.highlightFeature(this.selectionService.selection.selected)
           this.map.triggerRepaint();
 
@@ -393,6 +392,8 @@ panelStructure:'list'|'json' =  'list'
         layout: {
           'icon-size': 1,
           'icon-image': 'mapbox-marker-icon-red',
+          "icon-allow-overlap":true,
+          "icon-ignore-placement":true
         },
         filter: ['==', ['geometry-type'], 'Point'],
       });
@@ -431,9 +432,14 @@ panelStructure:'list'|'json' =  'list'
           'id': 'selection-symbol',
           'type': 'symbol',
           'source': 'selection-source',
+          paint:{
+            "icon-opacity":1
+          },
           layout: {
             'icon-size': 1,
             'icon-image': 'mapbox-marker-icon-yellow',
+            "icon-allow-overlap":true,
+            "icon-ignore-placement":true
           },
           filter: ['==', ['geometry-type'], 'Point'],
 

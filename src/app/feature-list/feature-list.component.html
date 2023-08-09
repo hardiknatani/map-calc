@@ -1,4 +1,4 @@
-<div *ngFor="let feature of features"
+<div *ngFor="let feature of features;let i = index"
     class=" hover:bg-gray-200 px-2 py-1 feature-list-item"   
      (contextmenu)="onRightClick(feature,$event)" 
     (click)="selectFeature(feature,$event)"  
@@ -6,7 +6,7 @@
     appClickOutside (clickOutside)="onClickOutsideFeature($event)"
 >
     <span class="ml-3">
-      {{feature.geometry.type | titlecase}}
+    {{i+1}}  {{feature.geometry.type | titlecase}}
     </span>
   </div>
 
