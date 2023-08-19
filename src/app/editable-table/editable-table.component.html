@@ -1,21 +1,26 @@
-<div class="px-2 py-2">
-  <div class=" mb-2 flex flex-row-reverse">
-    <button mat-raised-button (click)="AddNewRow()">
-      Add Row
-    </button>
-  </div>
-  <!-- <br /> -->
+<div >
 
+  <!-- <br /> -->
+<div class="w-full sticky bg-red flex justify-start items-center font-bold " > 
+<div class="w-24 text-center  text-xs"><span>Property</span></div>
+<div class="w-24 text-center text-xs" >Value</div>  
+<div>
+  <button mat-icon-button (click)="AddNewRow()">
+    <mat-icon>playlist_add_circle</mat-icon>   
+ </button>
+</div>
+</div>
+<div class=" overflow-auto ml-1" style="height: 330px;">
   <form [formGroup]="VOForm" autocomplete="off">
-    <div class="p-2 bg-white w-full">
+    <div class=" bg-white w-full">
       <ng-container formArrayName="VORows">
-        <table #table mat-table [dataSource]="dataSource">
+        <table class="block" #table mat-table [dataSource]="dataSource">
           <ng-container matColumnDef="property">
             <th style="text-align: center !important;" mat-header-cell *matHeaderCellDef>Property</th>
             <td class="border-gray-100 cursor-text bg-slate-400" (click)="propertyInput.click()" mat-cell
               *matCellDef="let element; let i = index" [formGroup]="element">
               <div class="h-full w-full">
-                <input #propertyInput matInput type="text" formControlName="property" />
+                <input class="w-24" #propertyInput matInput type="text" formControlName="property" />
               </div>
             </td>
           </ng-container>
@@ -25,27 +30,37 @@
             <td class="border-gray-100 border cursor-text " (click)="valueInput.click()" mat-cell
               *matCellDef="let element; let i = index" [formGroup]="element">
               <div class="h-full w-full">
-                <input #valueInput matInput type="text" formControlName="value" />
+                  <input class="w-24" #valueInput matInput type="text" formControlName="value" />
               </div>
             </td>
           </ng-container>
           <ng-container matColumnDef="actions">
-            <th style="text-align: center !important;" mat-header-cell *matHeaderCellDef>Actions</th>
-            <td style="border: none !important;" class=" cursor-text align-middle" mat-cell
+            <th style="text-align: center !important; width: 30px !important;" mat-header-cell *matHeaderCellDef>
+              <button mat-icon-button (click)="AddNewRow()">
+              <mat-icon>playlist_add_circle</mat-icon>   
+           </button>
+            </th>
+            <td style="border: none !important; background-color: white !important;" class=" cursor-text text-center align-middle" mat-cell
               *matCellDef="let element; let i = index" [formGroup]="element">
+            <div class="w-7 ml-1 flex justify-end">
               <button (click)="deleteRow(i)">
-                <mat-icon  >delete</mat-icon>
+                <mat-icon class="text-lg" size="14px"  >delete</mat-icon>
               </button>
+            </div>
             </td>
           </ng-container>
-          <!-- <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr> -->
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <!-- <tr class="mb-10" mat-header-row *matHeaderRowDef="displayedColumns"></tr> -->
+          <tr class="mt-10" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
         </table>
       </ng-container>
     </div>
   </form>
-  <mat-card *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center">
-  </mat-card>
+</div>
   <br>
+  <!-- <div class=" mb-2 flex flex-row-reverse">
+    <button mat-raised-button (click)="AddNewRow()">
+      Add Row
+    </button>
+  </div> -->
 </div>

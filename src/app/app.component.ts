@@ -264,7 +264,7 @@ panelStructure:'list'|'json' =  'list'
   }
 
   toggleSidebar() {
-    const id = 'right';
+    const id = 'right-sidebar';
     let elem = document.getElementById(id) as any;
     let classes = elem.className.split(' ');
     let collapsed = classes.indexOf('collapsed') !== -1;
@@ -346,6 +346,8 @@ panelStructure:'list'|'json' =  'list'
       );
       if (drawFeatures && drawFeatures.length > 0) {
         let feature = drawFeatures[0];
+        this.selectionService.selection.clear();
+        this.selectionService.selection.select(feature)
         this.addFeatureOptionPopup(event, feature);
       }
     });

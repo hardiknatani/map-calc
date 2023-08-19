@@ -13,18 +13,20 @@
   }
   
   .map-overlay {
-    font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font: 10px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
     position: absolute;
-    width: 650px;
-    right: 0;
-    padding: 10px;
+    width: fit-content;
+    height: 400px;
+    right: 12.5px;
+    bottom: 12.5px;
+    padding: 7.5px 0 7.5px 7.5px;
     z-index: 1;
-    // background-color: red;
+    background-color: white;
   }
 
   mat-sidenav{
     overflow: visible  !important;
-    width: 25vw !important;
+    width: 20vw !important;
    
 
   }
@@ -156,76 +158,75 @@
         margin-left: 0px !important;
       }
       
-.rounded-rect {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 0 50px -25px black;
-  }
+// .rounded-rect {
+//   background: white;
+//   border-radius: 10px;
+//   box-shadow: 0 0 50px -25px black;
+//   }
    
-  .flex-center {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  }
+//   .flex-center {
+//   position: absolute;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   }
    
-  .flex-center.left {
-  left: 0px;
-  }
+//   .flex-center.left {
+//   left: 0px;
+//   }
    
-  .flex-center.right {
-  right: 0px;
-  }
+//   .flex-center.right {
+//   right: 0px;
+//   top: 50%;
+//   }
    
-  .sidebar-content {
-  position: absolute;
-  width: 95%;
-  height: 95%;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 32px;
-  color: gray;
-  }
+//   .sidebar-content {
+//   position: absolute;
+//   width: 95%;
+//   height: 95%;
+//   font-family: Arial, Helvetica, sans-serif;
+//   font-size: 32px;
+//   color: gray;
+//   }
    
-  .sidebar-toggle {
-  position: absolute;
-  width: 1.3em;
-  height: 1.3em;
-  overflow: visible;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  }
+//   .sidebar-toggle {
+//   position: absolute;
+//   width: 1.3em;
+//   height: 1.3em;
+//   overflow: visible;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   }
    
-  .sidebar-toggle.left {
-  right: -1.5em;
-  }
+//   .sidebar-toggle.left {
+//   right: -1.5em;
+//   }
    
-  .sidebar-toggle.right {
-  left: -1.5em;
-  }
+//   .sidebar-toggle.right {
+//   left: -1.5em;
+//   }
    
-  .sidebar-toggle:hover {
-  color: #0aa1cf;
-  cursor: pointer;
-  }
+//   .sidebar-toggle:hover {
+//   color: #0aa1cf;
+//   cursor: pointer;
+//   }
    
-  .sidebar {
-  transition: transform 1s;
-  z-index: 1;
-  width: 300px;
-  height: 100%;
-  }
+//   .sidebar {
+//   transition: transform 1s;
+//   z-index: 1;
+//   width: 300px;
+//   height: 50%;
+//   }
    
   /*
   The sidebar styling has them "expanded" by default, we use CSS transforms to push them offscreen
   The toggleSidebar() function removes this class from the element in order to expand it.
   */
-  .left.collapsed {
-  transform: translateX(-295px);
-  }
+
    
   .right.collapsed {
-  transform: translateX(295px);
+  // transform: translateX(295px);
   }
 
 

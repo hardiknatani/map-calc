@@ -22,7 +22,7 @@
           <app-feature-list [features]="listFeatures" ></app-feature-list>
      
       </div>
-      <div class=" border border-slate-200 p-2 w-full h-fit py-2 fixed bottom-0  flex items-center gap-4 shadow-md" style="height:5%; width: 25vw;box-shadow: 0 -5px 10px -5px rgb(226 232 240);background-color: #f7f7f7;" >
+      <div class=" border border-slate-200 p-2 w-full h-fit py-2 fixed bottom-0  flex justify-between items-center gap-4 shadow-md" style="height:5%; width: 20vw;box-shadow: 0 -5px 10px -5px rgb(226 232 240);background-color: #f7f7f7;" >
       <div>
         <span>
           List
@@ -39,10 +39,10 @@
       </div>
       </div>
     </mat-tab>
-    <mat-tab  label="Properties" >
+    <!-- <mat-tab  label="Properties" >
       <app-editable-table [properties]="currentPropertiesFeature.properties"
         (propertiesChanged)="onPropertiesChanged($event)"></app-editable-table>
-    </mat-tab>
+    </mat-tab> -->
   </mat-tab-group>
 
 
@@ -57,15 +57,10 @@
     </div>
     <div class="map-wrap">
       <div #map id="map">
-        <div id="right" class="sidebar flex-center right collapsed">
+        <div id="right-sidebar" class=" bg-red collapsed map-overlay">
           <div class="sidebar-content rounded-rect flex-center">
-          Right Sidebar
-          <div
-          class="sidebar-toggle rounded-rect right"
-          (click)="toggleSidebar()"
-          >
-         &larr;
-          </div>
+            <app-editable-table class="w-full" [properties]="currentPropertiesFeature.properties"
+            (propertiesChanged)="onPropertiesChanged($event)"></app-editable-table>
           </div>
           </div>
       </div>
