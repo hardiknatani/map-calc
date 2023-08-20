@@ -27,6 +27,7 @@ import { normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
 import { SelectionService } from './selection.service';
+import PropertiesControl from './shared/maplibre-custom-controls/PropertiesControl';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -265,21 +266,18 @@ panelStructure:'list'|'json' =  'list'
 
   toggleSidebar() {
     const id = 'right-sidebar';
-    let elem = document.getElementById(id) as any;
-    let classes = elem.className.split(' ');
-    let collapsed = classes.indexOf('collapsed') !== -1;
+    let elem = document.getElementById(id);
+    let display = elem?.style.display;
+    console.log(display)
 
-    let padding = {};
+    if(display == null || display == '' || display=='none' ){
+      elem?.style.setProperty('display','block');
+    }else if(display=='block'){
+      elem?.style.setProperty('display','none');
 
-    if (collapsed) {
-      classes.splice(classes.indexOf('collapsed'), 1);
-
-      padding[id] = 300;
-    } else {
-      padding[id] = 0;
-      classes.push('collapsed');
     }
-    elem.className = classes.join(' ');
+
+
   }
 
   initMap() {
@@ -303,6 +301,7 @@ panelStructure:'list'|'json' =  'list'
     this.map.addControl(inspectControl);
     this.map.addControl(this.draw);
     this.map.addControl(new TileBoundariesControl());
+    this.map.addControl(new PropertiesControl())
     // this.map.addControl(new SaveEditsControl());
     //to-do test
     // pass geometry in save edit control
@@ -453,6 +452,10 @@ panelStructure:'list'|'json' =  'list'
 
       this.map.addImage(id, transparentIcon());
     });
+
+    this.map.on('togglePropertiesSideBar',()=>{
+      this.toggleSidebar()
+    })
 
 
   }
