@@ -27,8 +27,9 @@
 
   mat-sidenav{
     overflow: visible  !important;
+    height: 100vh;
     width: 20vw !important;
-   
+    
 
   }
   
@@ -40,94 +41,6 @@
   background:#ffffff96 ;
   box-shadow: 1px 0px 17px #0f0f0f45;
   }
-  
-  .customButton{
-  
-  
-    :hover, .customButton:focus{
-    background: #fff;
-  }}
-  
-  
-  .matlistitem{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  font-size: 14px;
-  mat-icon{
-    font-size: 15px;
-    margin-top: 3px;
-  }
-  button{
-   width: 20px;
-   height: 20px;
-
-  }
-  }
-  
-   
-  #filters{
-  mat-form-field{
-    max-height: 20%;
-  }
-  
-  }
-  
-  .filterArray{
-    mat-form-field{
-  
-      width: 25%;
-      font-size: 12px  !important; 
-      color: black !important;
-      height: 60px;
-      margin-bottom:- 1.25em;
-      text-align: left;
-
-      ::ng-deep .mat-form-field-flex{
-        background-color: white;
-        color: black;
-      }
-
-      
-    .mdc-line-ripple {
-      display: none !important;
-    }
-
-    mdc-line-ripple {
-      display: none !important;
-    }
-    }
-
-  
-    ::ng-deep .mat-form-field {
-        font-size: 11px  !important; 
-        // color: green !important;
-    }
-
-
-  ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
-  }
-  }
-  
-  #addFilterButton{
-      background-color: rgb(var(--color-primary));
-      border-radius: 5px;
-      color: white;
-      box-shadow: 1px 0px 6px #0f0f0f45;
-      padding: 2.5px 5px;
-      font-family: inherit;
-      font-size: 12px;
-      min-width: 50px;
-      white-space: nowrap;
-    }
-  
-  
-    #sidebar-right-legends{
-      width: 300px;
-      
-      visibility: hidden;
-    }
 
      .maplibregl-ctrl-attrib,.mapboxgl-ctrl-attrib {
       visibility: hidden !important;
@@ -158,80 +71,3 @@
         transition: all 0.7s ease;
         margin-left: 0px !important;
       }
-      
-// .rounded-rect {
-//   background: white;
-//   border-radius: 10px;
-//   box-shadow: 0 0 50px -25px black;
-//   }
-   
-//   .flex-center {
-//   position: absolute;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   }
-   
-//   .flex-center.left {
-//   left: 0px;
-//   }
-   
-//   .flex-center.right {
-//   right: 0px;
-//   top: 50%;
-//   }
-   
-//   .sidebar-content {
-//   position: absolute;
-//   width: 95%;
-//   height: 95%;
-//   font-family: Arial, Helvetica, sans-serif;
-//   font-size: 32px;
-//   color: gray;
-//   }
-   
-//   .sidebar-toggle {
-//   position: absolute;
-//   width: 1.3em;
-//   height: 1.3em;
-//   overflow: visible;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   }
-   
-//   .sidebar-toggle.left {
-//   right: -1.5em;
-//   }
-   
-//   .sidebar-toggle.right {
-//   left: -1.5em;
-//   }
-   
-//   .sidebar-toggle:hover {
-//   color: #0aa1cf;
-//   cursor: pointer;
-//   }
-   
-//   .sidebar {
-//   transition: transform 1s;
-//   z-index: 1;
-//   width: 300px;
-//   height: 50%;
-//   }
-   
-  /*
-  The sidebar styling has them "expanded" by default, we use CSS transforms to push them offscreen
-  The toggleSidebar() function removes this class from the element in order to expand it.
-  */
-
-   
-  .right.collapsed {
-  // transform: translateX(295px);
-  }
-
-
-::ng-deep .mat-mdc-tab-body-wrapper{
-  height: calc( 100vh - 50px);
-}
-

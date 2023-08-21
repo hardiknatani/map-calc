@@ -577,7 +577,7 @@ panelStructure:'list'|'json' =  'list'
 
   codeMirrorLoaded() {
     this.editor = (this.editor as any).codeMirror;
-    this.editor.setSize("100%", "100%");
+    this.editor.setSize("20vw", "95vh");
   }
 
   handleChange(e) {
@@ -588,7 +588,8 @@ panelStructure:'list'|'json' =  'list'
 
   updateEditorGeojson(){
   this.editor.setValue( JSON.stringify((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data,null,2));
-  this.editor.refresh()
+  this.editor.refresh();
+
   }
 
   onPanelStructureChanged(e){
