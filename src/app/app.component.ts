@@ -157,8 +157,15 @@ panelStructure:'list'|'json' =  'list'
     drawCtrl.appendChild(circleButton);
 
     this.selectionService.selection.changed.subscribe((data:any)=>{
+
+      if(this.selectionService.selection.selected.length==1){
+        let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id==this.selectionService.selection.selected[0].properties.mapcalc_id)
+        // this.currentPropertiesFeature =this.selectionService.selection.selected[0]
+      }
+
       this.highlightFeature(this.selectionService.selection.selected)
-          this.map.triggerRepaint();
+          // this.map.triggerRepaint();
 
     });
 
@@ -559,7 +566,7 @@ panelStructure:'list'|'json' =  'list'
 
     let feature = {
       type: 'Feature',
-      geometry: this.currentPropertiesFeature._geometry,
+      geometry: this.currentPropertiesFeature.geometry,
       properties: properties,
     };
 
@@ -570,7 +577,7 @@ panelStructure:'list'|'json' =  'list'
     data.features.splice(index, 1, feature);
 
     setTimeout(() => {
-      feature.geometry = this.currentPropertiesFeature._geometry;
+      feature.geometry = this.currentPropertiesFeature.geometry;
       (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
     }, 1000);
   }
