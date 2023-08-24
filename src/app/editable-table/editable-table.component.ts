@@ -57,8 +57,8 @@ export class EditableTableComponent implements OnInit,OnChanges {
  
      this.VOForm.valueChanges.pipe(  
       debounceTime(200),
-     distinctUntilChanged()).subscribe(data=>{
-      this.propertiesChanged.emit(data)
+     distinctUntilChanged()).subscribe(_=>{
+      this.propertiesChanged.emit(this.VOForm.getRawValue())
      })
  
    }
@@ -82,8 +82,8 @@ export class EditableTableComponent implements OnInit,OnChanges {
 
   Object.entries(properties).forEach(ele=>{
    control.push(this.fb.group({
-   property: new FormControl(ele[0]),
-   value: new FormControl(ele[1]),
+   property: new FormControl({value:ele[0],disabled:ele[0]=='mapcalc_id'?true:false}),
+   value: new FormControl({value:ele[1],disabled:ele[0]=='mapcalc_id'?true:false}),
    }));
   });
 

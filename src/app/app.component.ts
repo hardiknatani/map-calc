@@ -307,7 +307,7 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
     }) as any as IControl;
     this.map.addControl(inspectControl);
     this.map.addControl(this.draw);
-    this.map.addControl(new TileBoundariesControl());
+    // this.map.addControl(new TileBoundariesControl());
     this.map.addControl(new PropertiesControl())
     // this.map.addControl(new SaveEditsControl());
     //to-do test
@@ -647,8 +647,9 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
       });
       let bbox: any = turf.bbox(data);
       this.map.fitBounds((bbox as any), {
-        padding: 5, zoom: 12, linear: true, speed: 5, animate: true
+        padding: 5, linear: true, speed: 5, animate: true
       });
+      this.map.setZoom(this.map.getZoom()-1.5)
     }
   }
 
@@ -689,7 +690,14 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
           this.zoomTo(this.selectionService.selection.selected)
         break;
       case 'delete':
-        
+        let featuresToDeleteIds = this.selectionService.selection.selected.map(ele=>ele.properties.mapcalc_id);
+        console.log(featuresToDeleteIds)
+        let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+        data.features = data.features.filter(feature=>!featuresToDeleteIds.includes(feature.properties.mapcalc_id));
+        (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+        this.updatePanel();
+        this.updateEditorGeojson()
+            
         break;
     
       default:
