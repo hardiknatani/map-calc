@@ -36,12 +36,12 @@ import PropertiesControl from './shared/maplibre-custom-controls/PropertiesContr
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   map: Map;
 
-  @ViewChild('map', { static: true })
+  @ViewChild('mapContainer', { static: true })
   private mapContainer!: ElementRef<HTMLElement>;
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
   @ViewChild('codeMirror', { static: true }) editor!: Editor;
   @ViewChild('importInput', { static: true }) importInput!: ElementRef<HTMLInputElement>;
-
+  turf = turf
   selectedTab: any;
   // @BlockUI() blockUI: NgBlockUI;
   mapControls: any;
@@ -275,7 +275,6 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
     const id = 'right-sidebar';
     let elem = document.getElementById(id);
     let display = elem?.style.display;
-    console.log(display)
 
     if(display == null || display == '' || display=='none' ){
       elem?.style.setProperty('display','block');
@@ -308,7 +307,7 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
     this.map.addControl(inspectControl);
     this.map.addControl(this.draw);
     // this.map.addControl(new TileBoundariesControl());
-    this.map.addControl(new PropertiesControl())
+    this.map.addControl(new PropertiesControl(),'bottom-right')
     // this.map.addControl(new SaveEditsControl());
     //to-do test
     // pass geometry in save edit control

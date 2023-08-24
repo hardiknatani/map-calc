@@ -95,7 +95,7 @@ export class EditableTableComponent implements OnInit,OnChanges {
    AddNewRow() {
  
      const control = this.VOForm.get('VORows') as FormArray;
-     control.insert(0,this.initiateVOForm());
+     control.insert(control.length,this.initiateVOForm());
      this.dataSource = new MatTableDataSource(control.controls)
  
    }

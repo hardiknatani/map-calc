@@ -56,11 +56,37 @@
       </button>
     </div>
     <div class="map-wrap">
-      <div #map id="map">
+      <div #mapContainer id="map">
         <div id="right-sidebar" class=" collapsed map-overlay">
-          <div class="sidebar-content rounded-rect flex-center">
+          <div class="px-1 h-7 w-full bg-red-500 text-white font-semibold text-sm flex justify-between items-center">
+            <span> {{currentPropertiesFeature?.geometry?.type}}
+            </span>
+            <mat-icon matRipple (click)="map.fire('togglePropertiesSideBar')" > close </mat-icon>
+          </div>
+          <div class="sidebar-content rounded-rect flex-center" style="  padding: 7.5px 0 7.5px 7.5px;">
             <app-editable-table class="w-full" [properties]="currentPropertiesFeature.properties"
             (propertiesChanged)="onPropertiesChanged($event)"></app-editable-table>
+            <div class="w-full h-auto" >
+              <div class="px-1 h-7 w-full font-semibold text-sm flex justify-between items-center">
+                <span>Geometry Info</span>
+              </div>
+              <div *ngIf="currentPropertiesFeature?.geometry?.type=='LineString'" >
+                Length {{ turf.length(currentPropertiesFeature)}}
+              </div>
+              <div *ngIf="currentPropertiesFeature?.geometry?.type=='Polygon' || currentPropertiesFeature?.geometry?.type=='MultiPolygon'" >
+              <p>
+                Area
+                {{turf.area(currentPropertiesFeature)}}
+              </p>
+              <p>
+                Perimeter
+                {{turf.length(turf.polygonToLine(currentPropertiesFeature))}}
+              </p>
+              </div>
+              <div *ngIf="currentPropertiesFeature?.geometry?.type=='Point'" >
+               -------------
+              </div>
+            </div>
           </div>
           </div>
       </div>
