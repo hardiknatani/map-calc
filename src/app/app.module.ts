@@ -13,7 +13,7 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { ClickOutsideDirective } from './shared/clickOutside.directive';
 import { SelectionService } from './selection.service';
 import { FeatureListComponent } from './feature-list/feature-list.component';
-
+import { NgxSpinnerModule } from "ngx-spinner";
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,7 +28,9 @@ import { FeatureListComponent } from './feature-list/feature-list.component';
     FormsModule,
      ReactiveFormsModule
     ,BlockUIModule.forRoot(),
-    CodemirrorModule
+    CodemirrorModule,
+    NgxSpinnerModule.forRoot({ type: 'ball-scale-multiple' })
+
   ],
   providers: [SelectionService],
   bootstrap: [AppComponent]

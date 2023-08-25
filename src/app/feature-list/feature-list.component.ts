@@ -97,10 +97,15 @@ export class FeatureListComponent implements OnChanges {
     this.menuVisibility=false;
   }
   onClickOutsideFeature(e){
-    if(e.target.classList.contains('feature-list-item')){
-      return
-    }else{
-      this.selection.clear(true)
+    // if(e.target.classList.contains('feature-list-item') || e.target.parentNode.classList.contains('options-buttons') ){
+    //   return
+    // }else{
+    //   this.selection.clear(true)  
+    // }
+
+        if(e.target.classList.contains('maplibregl-canvas') ){
+          this.selection.clear(true)  
+
     }
   }
 

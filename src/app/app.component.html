@@ -1,14 +1,22 @@
 <mat-sidenav-container [hasBackdrop]="false" autoSize>
   <mat-sidenav #sidenav opened mode="over" [disableClose]="true">
+    
+    <ngx-spinner
+    [fullScreen]="false"
+    type="ball-scale-multiple"
+    size="medium"
+  >
+</ngx-spinner>
+
     <div class="absolute  top-2 -right-12 z-9999 "  >
-      <button mat-mini-fab class="bg-white" (click)="sidenav.toggle()">
-        <mat-icon *ngIf="sidenav.opened">layers_clear</mat-icon>
+      <button mat-mini-fab class="bg-red-600" color="warn" (click)="sidenav.toggle()">
+          <mat-icon *ngIf="sidenav.opened">layers_clear</mat-icon>
         <mat-icon *ngIf="!sidenav.opened">layers</mat-icon>
       </button>
     </div>
 
 <div class="h-full flex flex-col overflow-y-clip">
-  
+
 <div class="overflow-auto" style="height: 95%  !important; display: block;" >
   <div class="w-full " >
     <div [ngStyle]="{display: panelStructure=='json' ? 'block' : 'none'}"
@@ -21,15 +29,16 @@
     </ngx-codemirror>
   </div>
   <div [ngStyle]="{display: panelStructure=='list' ? 'block' : 'none'}"  class=" bg-white  " >
-      <app-feature-list [features]="listFeatures" ></app-feature-list>
-  
+      <app-feature-list *ngIf="listFeatures.length!=0" [features]="listFeatures" ></app-feature-list>
+      <div class=" p-2 h-full flex items-center justify-center whitespace-normal text-center " *ngIf="listFeatures.length==0" ><h3>Create or Import Features first</h3></div>
+
   </div>
   </div>
   </div>
   
   
   
-    <div style="height: 5vh; width: 20vw;box-shadow: 0 -5px 10px -5px rgb(226 232 240);background-color: #f7f7f7;" class=" border border-slate-200  w-full flex justify-between items-center gap-4 shadow-md"  >
+    <div style="height: 5vh; width: 20vw;box-shadow: 0 -5px 10px -5px rgb(226 232 240);background-color: #f7f7f7;" class="p-1 border border-slate-200  w-full flex justify-between items-center gap-4 shadow-md"  >
       <div>
         <span>
           List
@@ -38,15 +47,21 @@
       </mat-slide-toggle>
       JSON
       </div>
-      <div>
-        <button color="primary"  class="font-bold px-2 py-1 border bg-purple-300 rounded-md" (click)="importInput.click()"  >
-         + Import 
+      <div class="flex">
+        <button color="primary"  class="font-bold px-2 py-1 border bg-purple-300 rounded-md flex items-center justify-between" (click)="importInput.click()"  >
+          <mat-icon>file_upload</mat-icon>
+          Import 
+        </button>
+        <button color="primary"  class="font-bold px-2 py-1 border bg-purple-300 rounded-md flex items-center justify-between" (click)="downloadFile()"  >
+          <mat-icon>download</mat-icon>
+          Export 
         </button>
         <input #importInput id="importInput" (change)="readFile($event)"   class=" hidden" type="file" name="" id="">
       </div>
       </div>
   
 </div>
+
   </mat-sidenav>
 
   <mat-sidenav-content>
@@ -58,36 +73,41 @@
     <div class="map-wrap">
       <div #mapContainer id="map">
         <div id="right-sidebar" class=" collapsed map-overlay">
-          <div class="px-1 h-7 w-full bg-red-500 text-white font-semibold text-sm flex justify-between items-center">
-            <span> {{currentPropertiesFeature?.geometry?.type}}
-            </span>
-            <mat-icon matRipple (click)="map.fire('togglePropertiesSideBar')" > close </mat-icon>
-          </div>
-          <div class="sidebar-content rounded-rect flex-center" style="  padding: 7.5px 0 7.5px 7.5px;">
-            <app-editable-table class="w-full" [properties]="currentPropertiesFeature.properties"
-            (propertiesChanged)="onPropertiesChanged($event)"></app-editable-table>
-            <div class="w-full h-auto" >
-              <div class="px-1 h-7 w-full font-semibold text-sm flex justify-between items-center">
-                <span>Geometry Info</span>
-              </div>
-              <div *ngIf="currentPropertiesFeature?.geometry?.type=='LineString'" >
-                Length {{ turf.length(currentPropertiesFeature)}}
-              </div>
-              <div *ngIf="currentPropertiesFeature?.geometry?.type=='Polygon' || currentPropertiesFeature?.geometry?.type=='MultiPolygon'" >
-              <p>
-                Area
-                {{turf.area(currentPropertiesFeature)}}
-              </p>
-              <p>
-                Perimeter
-                {{turf.length(turf.polygonToLine(currentPropertiesFeature))}}
-              </p>
-              </div>
-              <div *ngIf="currentPropertiesFeature?.geometry?.type=='Point'" >
-               -------------
-              </div>
-            </div>
-          </div>
+          <div class=" p-2 h-full flex items-center justify-center whitespace-normal text-center " *ngIf="selection.length==0" ><h3>Select a Feature to view Properties</h3></div>
+
+          <div class=" p-2 h-full flex items-center justify-center  whitespace-normal text-center" *ngIf="selection.length>1" ><h3>Select an Individual Feature to view Properties</h3></div>
+<div *ngIf="selection.length==1">
+  <div  class="px-1 h-7 w-full bg-red-500 text-white font-semibold text-sm flex justify-between items-center">
+    <span> {{currentPropertiesFeature?.geometry?.type}}
+    </span>
+    <mat-icon matRipple (click)="map.fire('togglePropertiesSideBar')" > close </mat-icon>
+  </div>
+  <div  class="sidebar-content rounded-rect flex-center" style="  padding: 7.5px 0 7.5px 7.5px;">
+    <app-editable-table  class="w-full" [properties]="currentPropertiesFeature.properties"
+    (propertiesChanged)="onPropertiesChanged($event)"></app-editable-table>
+    <div class="w-full h-auto" >
+      <div class="px-1 h-7 w-full font-semibold text-sm flex justify-between items-center">
+        <span>Geometry Info</span>
+      </div>
+      <div *ngIf="currentPropertiesFeature?.geometry?.type=='LineString'" >
+        Length {{Number( turf.length(currentPropertiesFeature)).toFixed(2)}} Km
+      </div>
+      <div *ngIf="currentPropertiesFeature?.geometry?.type=='Polygon' || currentPropertiesFeature?.geometry?.type=='MultiPolygon'" >
+      <p>
+        Area
+        {{Number( turf.area(currentPropertiesFeature) * 0.000001 ).toFixed(2).toString()  }} Km<sup>2</sup>
+      </p>
+      <p>
+        Perimeter
+        {{Number(turf.length(turf.polygonToLine(currentPropertiesFeature))).toFixed(2)}} Km
+      </p>
+      </div>
+      <div *ngIf="currentPropertiesFeature?.geometry?.type=='Point'" >
+       -------------
+      </div>
+    </div>
+  </div>
+</div>
           </div>
       </div>
 <div class="map-position-info" >

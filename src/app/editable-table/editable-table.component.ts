@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -10,9 +10,6 @@ export interface PeriodicElement {
 
 }
 
-const ELEMENT_DATA: PeriodicElement[] = [
-
-];
 
 @Component({
   selector: 'app-editable-table',
@@ -29,31 +26,28 @@ export class EditableTableComponent implements OnInit,OnChanges {
   displayedColumns: string[] = ['property','value',"actions"];
   dataSource = new MatTableDataSource<any>();
  
- isLoading = true;
- 
  pageNumber: number = 1;
    VOForm: FormGroup;
-   isEditableNew: boolean = true;
    constructor(
      private fb: FormBuilder,
      private _formBuilder: FormBuilder){}
  
    ngOnInit(): void {
-
      this.VOForm = this._formBuilder.group({
        VORows: this._formBuilder.array([])
      });
  
       this.VOForm = this.fb.group({
-               VORows: this.fb.array(ELEMENT_DATA.map(val => this.fb.group({
-                 property: new FormControl(val.property),
-                 value: new FormControl(val.value),
- 
-               })
+               VORows: this.fb.array(Object.entries(this.properties).map((val:any) =>  this.fb.group({
+                  property: new FormControl(val[0]),
+                  value: new FormControl(val[1]),
+  
+                })
+               
                )) //end of fb array
              }); // end of form group cretation
-     this.isLoading = false;
-     this.dataSource = new MatTableDataSource((this.VOForm.get('VORows') as FormArray).controls);
+
+             this.dataSource = new MatTableDataSource((this.VOForm.get('VORows') as FormArray).controls);
  
      this.VOForm.valueChanges.pipe(  
       debounceTime(200),
@@ -105,7 +99,6 @@ export class EditableTableComponent implements OnInit,OnChanges {
  
      // VOFormElement.get('VORows').at(i).get('name').disabled(false)
      VOFormElement.get('VORows').at(i).get('isEditable').patchValue(false);
-     // this.isEditableNew = true;
  
    }
  

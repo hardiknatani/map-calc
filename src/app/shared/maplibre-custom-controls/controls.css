@@ -21,16 +21,16 @@
 }
 
 .mapbox-control-inspect-popup {
-  max-height: 40vh;
-  overflow-y: auto;
+  /* max-height: 40vh;
+  overflow-y: auto; */
   position: absolute;
   padding-top: 5px;
   transform: translate(-50%, 0);
 }
 .mapbox-control-inspect-content {
   max-height: 40vh;
-  max-width: 25vw;
-  /* overflow-y: scroll; */
+  width: 25vw;
+  overflow-y: scroll;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;

@@ -28,6 +28,8 @@ import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
 import { SelectionService } from './selection.service';
 import PropertiesControl from './shared/maplibre-custom-controls/PropertiesControl';
+import { NgxSpinnerService } from "ngx-spinner";
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -41,7 +43,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
   @ViewChild('codeMirror', { static: true }) editor!: Editor;
   @ViewChild('importInput', { static: true }) importInput!: ElementRef<HTMLInputElement>;
-  turf = turf
+  turf = turf;
+  Number=Number
   selectedTab: any;
   // @BlockUI() blockUI: NgBlockUI;
   mapControls: any;
@@ -70,6 +73,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   };
   layersStyle: any;
   draw: any = new MapboxDraw(this.drawControlOptions) as any as IControl;
+  propertiesControl = new PropertiesControl()
 
   showControls = false;
   selectedFeature: any;
@@ -113,7 +117,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   listFeatures:any[]=[];  
 
-panelStructure:'list'|'json' =  'list'
+panelStructure:'list'|'json' =  'list';
+
+get selection(){
+  return this.selectionService.selection.selected
+}
 
   constructor(
     private dialog: MatDialog,
@@ -121,7 +129,8 @@ panelStructure:'list'|'json' =  'list'
     private bottomSheet: MatBottomSheet,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private selectionService:SelectionService
+    private selectionService:SelectionService,
+    private ngxSpinner:NgxSpinnerService
   ) {}
 
 
@@ -158,10 +167,10 @@ panelStructure:'list'|'json' =  'list'
 
     this.selectionService.selection.changed.subscribe((data:any)=>{
 
-      if(this.selectionService.selection.selected.length==1){
+      if(this.selection.length==1){
         let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
-this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id==this.selectionService.selection.selected[0].properties.mapcalc_id)
-        // this.currentPropertiesFeature =this.selectionService.selection.selected[0]
+        this.currentPropertiesFeature=this.selection[0];
+
       }
 
       this.highlightFeature(this.selectionService.selection.selected)
@@ -307,7 +316,7 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
     this.map.addControl(inspectControl);
     this.map.addControl(this.draw);
     // this.map.addControl(new TileBoundariesControl());
-    this.map.addControl(new PropertiesControl(),'bottom-right')
+    this.map.addControl(this.propertiesControl,'bottom-right')
     // this.map.addControl(new SaveEditsControl());
     //to-do test
     // pass geometry in save edit control
@@ -500,9 +509,17 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
     let propertiesButton = document.createElement('button');
     propertiesButton.innerHTML = 'Properties';
     propertiesButton.addEventListener('click', () => {
-      !this.sidenav.opened && this.sidenav.open();
-
-      this.selectedTab = 2;
+      // !this.sidenav.opened && this.sidenav.open();
+      const id = 'right-sidebar';
+      let elem = document.getElementById(id);
+      let display = elem?.style.display;
+  
+      // if(display == null || display == '' || display=='none' ){
+        elem?.style.setProperty('display','block');
+      // }else if(display=='block'){
+      //   elem?.style.setProperty('display','none');
+  
+      // };
       this.currentPropertiesFeature = feature;
       featureOptionPopup.remove();
     });
@@ -653,7 +670,10 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
   }
 
   readFile(e){
+    this.ngxSpinner.show()
     let file = (this.importInput.nativeElement.files as any)[0];
+    if(!file)
+    return;
     let that = this
     const reader = new FileReader();
     reader.onload = function (event) {
@@ -674,8 +694,11 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
           })
          }
           (that.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(geojson);
-          that.updatePanel()
+          that.updatePanel();
+          that.ngxSpinner.hide()
         } catch (e) {
+          that.ngxSpinner.hide()
+
           // displayError('Error parsing JSON file.');
       }
   };
@@ -690,7 +713,6 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
         break;
       case 'delete':
         let featuresToDeleteIds = this.selectionService.selection.selected.map(ele=>ele.properties.mapcalc_id);
-        console.log(featuresToDeleteIds)
         let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
         data.features = data.features.filter(feature=>!featuresToDeleteIds.includes(feature.properties.mapcalc_id));
         (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
@@ -703,6 +725,17 @@ this.currentPropertiesFeature=data.features.find(ele=>ele.properties.mapcalc_id=
         break;
     }
 
+  }
+
+  downloadFile() {
+    let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+    var downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href",     dataStr);
+    downloadAnchorNode.setAttribute("download", "Mapcalc" + ".json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
   }
 
 }
