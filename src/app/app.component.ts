@@ -485,12 +485,19 @@ get selection(){
       this.currentEditFeature;
       data = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
       this.currentEditFeature = data.features.find((ele) =>ele.properties[PROPERTIES.MAPCALC_ID] ==feature.properties[PROPERTIES.MAPCALC_ID]);
-      data = data.features.filter((ele) =>ele.properties[PROPERTIES.MAPCALC_ID] !== feature.properties[PROPERTIES.MAPCALC_ID]);
-      (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource
-      ).setData({
-        type: 'FeatureCollection',
-        features: data,
-      });
+      
+      this.map.setFilter(MAP_DATA_META.FILL_LAYER,['all',
+        ['!=',['get',PROPERTIES.MAPCALC_ID], this.currentEditFeature.properties[PROPERTIES.MAPCALC_ID]],
+        ['==', ['geometry-type'], 'Polygon']
+      ]);
+      this.map.setFilter(MAP_DATA_META.LINE_LAYER,['all',
+        ['!=',['get',PROPERTIES.MAPCALC_ID], this.currentEditFeature.properties[PROPERTIES.MAPCALC_ID]],
+        ['==', ['geometry-type'], 'LineString']
+      ]); 
+        this.map.setFilter(MAP_DATA_META.SYMBOL_LAYER,['all',
+        ['!=',['get',PROPERTIES.MAPCALC_ID], this.currentEditFeature.properties[PROPERTIES.MAPCALC_ID]],
+        ['==', ['geometry-type'], 'Point']
+      ]);
 
       this.draw.deleteAll();
       this.isEditing = true;
@@ -560,10 +567,24 @@ get selection(){
   }
 
   onToggleEdit(action: string) {
+
+    if(action=='save'){
     let feature = action == 'save' ? this.draw.getAll().features[0]: this.currentEditFeature;
     let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+    data.features = data.features.filter(f=>
+      f.properties.mapcalc_id!=this.currentEditFeature.properties.mapcalc_id
+    )
     data.features.push(feature);
     (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+
+
+    }else if(action=='cancel'){
+
+    }
+
+    this.map.setFilter(MAP_DATA_META.FILL_LAYER, ['==', ['geometry-type'], 'Polygon']);
+    this.map.setFilter(MAP_DATA_META.LINE_LAYER, ['==', ['geometry-type'], 'LineString']);
+    this.map.setFilter(MAP_DATA_META.SYMBOL_LAYER, ['==', ['geometry-type'], 'Point']);
 
     this.draw.deleteAll();
     this.isEditing = false;
