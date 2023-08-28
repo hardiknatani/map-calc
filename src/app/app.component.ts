@@ -180,7 +180,6 @@ get selection(){
 
     this.selectionService.contextMenuAction.subscribe(action=>this.onContextMenuAction(action))
 
-
   }
   ngOnDestroy() {
     if (this.bottomSheet._openedBottomSheetRef) {
@@ -727,6 +726,8 @@ get selection(){
   }
 
   onContextMenuAction(action){
+    let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+
   
     switch (action) {
       case 'zoom-to':
@@ -734,13 +735,21 @@ get selection(){
         break;
       case 'delete':
         let featuresToDeleteIds = this.selectionService.selection.selected.map(ele=>ele.properties.mapcalc_id);
-        let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
         data.features = data.features.filter(feature=>!featuresToDeleteIds.includes(feature.properties.mapcalc_id));
         (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
         this.updatePanel();
         this.updateEditorGeojson()
-            
         break;
+        case 'buffer':
+        let buffer = turf.buffer(this.selection[0],5000,{units:'meters'});
+        buffer.properties={};
+        buffer.properties[PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000);
+        data.features.push(buffer);
+        (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+        this.updatePanel();
+
+
+          break;
     
       default:
         break;

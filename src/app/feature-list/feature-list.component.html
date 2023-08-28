@@ -12,6 +12,17 @@
 
   <div #menu appClickOutside (clickOutside)="closeMenu()"  class=" bg-slate-100 w-24 h-fit flex flex-col shadow-md" [style.display]="menuVisibility?'block':'none'" > 
 <div class="flex flex-col p">
-    <button *ngFor="let action of contextMenuActions" class="context-menu-buttons" (click)="onContextMenuAction(action.value,$event)" >{{action.viewValue}}</button>
+  <div *ngFor="let action of contextMenuActions" >
+    <button *ngIf="action.type=='button'" class="context-menu-buttons" (click)="onContextMenuAction(action.value,$event)" >{{action.viewValue}}</button>
+    <div  *ngIf="action.type=='dropdown'" >
+      <div class="dropdown context-menu-buttons text-center" > {{action.viewValue}}<mat-icon class="text-base" >play_arrow</mat-icon>
+        <div class="dropdown-content" >
+          <button  *ngFor="let child of action.children"    (click)="onContextMenuAction(child.value,$event)" >{{child.viewValue}}</button>  
+      </div>
+      </div>
+
+
+     </div>
+    </div>
 </div>
   </div>

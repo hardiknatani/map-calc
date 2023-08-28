@@ -90,16 +90,24 @@
         <span>Geometry Info</span>
       </div>
       <div *ngIf="currentPropertiesFeature?.geometry?.type=='LineString'" >
-        Length {{Number( turf.length(currentPropertiesFeature)).toFixed(2)}} Km
+        <span class="text-xs text-gray-500">
+          Length
+        </span> {{Number( turf.length(currentPropertiesFeature)).toFixed(2)}} Km
       </div>
       <div *ngIf="currentPropertiesFeature?.geometry?.type=='Polygon' || currentPropertiesFeature?.geometry?.type=='MultiPolygon'" >
       <p>
-        Area
+        <span class="text-xs text-gray-500">Area</span>
         {{Number( turf.area(currentPropertiesFeature) * 0.000001 ).toFixed(2).toString()  }} Km<sup>2</sup>
       </p>
       <p>
-        Perimeter
+        <span class="text-xs text-gray-500">Perimeter</span>
         {{Number(turf.length(turf.polygonToLine(currentPropertiesFeature))).toFixed(2)}} Km
+      </p>
+      <p>
+        <span class="text-xs text-gray-500">Centroid</span>
+        {{Number(turf.centroid(currentPropertiesFeature).geometry.coordinates[0]).toFixed(2)}},
+        {{Number(turf.centroid(currentPropertiesFeature).geometry.coordinates[1]).toFixed(2)}} 
+
       </p>
       </div>
       <div *ngIf="currentPropertiesFeature?.geometry?.type=='Point'" >
