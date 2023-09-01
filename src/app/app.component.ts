@@ -29,6 +29,7 @@ import * as turf from '@turf/turf'
 import { SelectionService } from './selection.service';
 import PropertiesControl from './shared/maplibre-custom-controls/PropertiesControl';
 import { NgxSpinnerService } from "ngx-spinner";
+import { ActionParamFormComponent } from './action-param-form/action-param-form.component';
 
 @Component({
   selector: 'app-root',
@@ -372,6 +373,9 @@ get selection(){
           type: 'FeatureCollection',
           features: [],
         },
+        generateId:true,
+        maxzoom:24,
+        tolerance:0
       });
 
       this.map.addLayer({
@@ -382,6 +386,7 @@ get selection(){
           'fill-color': '#E21818',
           'fill-opacity': 0.5,
           'fill-outline-color': '#F84C4C',
+          "fill-antialias":false
         },
         filter: ['==', ['geometry-type'], 'Polygon'],
       });
@@ -741,12 +746,18 @@ get selection(){
         this.updateEditorGeojson()
         break;
         case 'buffer':
-        let buffer = turf.buffer(this.selection[0],5000,{units:'meters'});
-        buffer.properties={};
-        buffer.properties[PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000);
-        data.features.push(buffer);
-        (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
-        this.updatePanel();
+          this.dialog.open(ActionParamFormComponent,{data:{controls:['buffer-radius']},width:"25vw",height:"25vh"
+          
+        }).afterClosed().subscribe(dialogData=>{
+          console.log(dialogData)
+            let buffer = turf.buffer(this.selection[0],parseInt(dialogData['buffer-radius']),{units:'meters'});
+            buffer.properties={};
+            buffer.properties[PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000);
+            data.features.push(buffer);
+            (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+            this.updatePanel();
+          })
+
 
 
           break;

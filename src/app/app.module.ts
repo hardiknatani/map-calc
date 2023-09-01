@@ -14,10 +14,11 @@ import { ClickOutsideDirective } from './shared/clickOutside.directive';
 import { SelectionService } from './selection.service';
 import { FeatureListComponent } from './feature-list/feature-list.component';
 import { NgxSpinnerModule } from "ngx-spinner";
+import { ActionParamFormComponent } from './action-param-form/action-param-form.component';
 @NgModule({
   declarations: [
     AppComponent,
-    EditableTableComponent,ClickOutsideDirective, FeatureListComponent
+    EditableTableComponent,ClickOutsideDirective, FeatureListComponent, ActionParamFormComponent
   ],
   imports: [
     BrowserModule,
