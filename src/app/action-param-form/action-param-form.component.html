@@ -1,0 +1,16 @@
+<div class="p-2">
+    <form [formGroup]="form">
+
+        <ng-container *ngFor="let control of data.controls" >
+        
+            <mat-form-field>
+                <mat-label>BufferRadius</mat-label>
+                <input matInput type="text" [formControlName]="control" >
+            </mat-form-field>
+        
+        </ng-container>    
+        </form>
+        <button mat-raised-button color="primary" (click)="cancel()" >Cancel</button>
+
+        <button mat-raised-button color="primary" (click)="save()" >Create Buffer</button>
+</div>
