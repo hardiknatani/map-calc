@@ -73,10 +73,10 @@
     <div class="map-wrap">
       <div #mapContainer id="map">
         <div id="right-sidebar" class=" collapsed map-overlay">
-          <div class=" p-2 h-full flex items-center justify-center whitespace-normal text-center " *ngIf="selection.length==0" ><h3>Select a Feature to view Properties</h3></div>
+          <div class=" p-2 h-full flex items-center justify-center whitespace-normal text-center " *ngIf="selected.length==0" ><h3>Select a Feature to view Properties</h3></div>
 
-          <div class=" p-2 h-full flex items-center justify-center  whitespace-normal text-center" *ngIf="selection.length>1" ><h3>Select an Individual Feature to view Properties</h3></div>
-<div *ngIf="selection.length==1">
+          <div class=" p-2 h-full flex items-center justify-center  whitespace-normal text-center" *ngIf="selected.length>1" ><h3>Select an Individual Feature to view Properties</h3></div>
+<div *ngIf="selected.length==1">
   <div  class="px-1 h-7 w-full bg-red-500 text-white font-semibold text-sm flex justify-between items-center">
     <span> {{currentPropertiesFeature?.geometry?.type}}
     </span>

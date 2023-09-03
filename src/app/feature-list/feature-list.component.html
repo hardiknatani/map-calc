@@ -2,7 +2,7 @@
     class=" hover:bg-gray-200 px-2 py-1 feature-list-item"   
      (contextmenu)="onRightClick(feature,$event)" 
     (click)="selectFeature(feature,$event)"  
-    [class.highlighted]="selection.isSelected(feature)"  
+    [class.highlighted]="isSelected(feature)"  
     appClickOutside (clickOutside)="onClickOutsideFeature($event)"
 >
     <span class="ml-3">

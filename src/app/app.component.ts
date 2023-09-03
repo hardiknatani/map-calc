@@ -120,7 +120,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
 panelStructure:'list'|'json' =  'list';
 
-get selection(){
+get selected(){
   return this.selectionService.selection.selected
 }
 
@@ -166,16 +166,24 @@ get selection(){
     });
     drawCtrl.appendChild(circleButton);
 
-    this.selectionService.selection.changed.subscribe((data:any)=>{
+    this.selectionService.selection.changed.subscribe((_:any)=>{
 
-      if(this.selection.length==1){
+      if(this.selectionService.selected.length==1){
         let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
-        this.currentPropertiesFeature=this.selection[0];
-
+        this.currentPropertiesFeature=data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
       }
 
-      this.highlightFeature(this.selectionService.selection.selected)
-          // this.map.triggerRepaint();
+      let data:any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+      let features =  data.features.map(f=>{
+        this.selectionService.selected.includes(f.properties[PROPERTIES.MAPCALC_ID])
+          ?f.properties['selected']=true
+          :f.properties['selected']=false;
+        
+        return f
+      });
+    
+    (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData({type: 'FeatureCollection',features: features});
+    
 
     });
 
@@ -311,7 +319,7 @@ get selection(){
     });
 
     let inspectControl: IControl = new InspectControl({
-      console: true,
+      console: false,
     }) as any as IControl;
     this.map.addControl(inspectControl);
     this.map.addControl(this.draw);
@@ -355,13 +363,15 @@ get selection(){
       }
 
       let selectedFeatures = this.map.queryRenderedFeatures(event.point);
+      // console.log("drawFeatures")
       let drawFeatures = selectedFeatures.filter(
         (feature) => feature.source == MAP_DATA_META.MAP_DATA_SOURCE
       );
       if (drawFeatures && drawFeatures.length > 0) {
         let feature = drawFeatures[0];
-        this.selectionService.selection.clear();
-        this.selectionService.selection.select(feature)
+        this.selectionService.selectFeatureFromMap(event)
+        // this.selectionService.selection.clear();
+        // this.selectionService.selection.select(feature)
         this.addFeatureOptionPopup(event, feature);
       }
     });
@@ -384,9 +394,12 @@ get selection(){
         source: MAP_DATA_META.MAP_DATA_SOURCE,
         paint: {
           'fill-color': '#E21818',
-          'fill-opacity': 0.5,
-          'fill-outline-color': '#F84C4C',
-          "fill-antialias":false
+          'fill-opacity': ['case',
+           ['==', ['get', 'selected'], true],
+            1,
+           0.5],
+          'fill-outline-color': '#191D88',
+          'fill-antialias': false,
         },
         filter: ['==', ['geometry-type'], 'Polygon'],
       });
@@ -418,52 +431,52 @@ get selection(){
         filter: ['==', ['geometry-type'], 'Point'],
       });
 
-      this.map.addSource("selection-source",{
-        type:'geojson',
-        data:{
-        type:"FeatureCollection",
-        features:[]
-      }});
-        this.map.addLayer({
-          'id': 'selection-polygon',
-          'type': 'fill',
-          'source': 'selection-source',
-          'paint': {
-          'fill-color':  '#FFED00',
-          "fill-opacity":0.5,
-        'fill-outline-color':'#FFED00'
-          },
-          filter: ['==', ['geometry-type'], 'Polygon'],
+      // this.map.addSource("selection-source",{
+      //   type:'geojson',
+      //   data:{
+      //   type:"FeatureCollection",
+      //   features:[]
+      // }});
+      //   this.map.addLayer({
+      //     'id': 'selection-polygon',
+      //     'type': 'fill',
+      //     'source': 'selection-source',
+      //     'paint': {
+      //     'fill-color':  '#FFED00',
+      //     "fill-opacity":0.5,
+      //   'fill-outline-color':'#FFED00'
+      //     },
+      //     filter: ['==', ['geometry-type'], 'Polygon'],
 
-        })
-        this.map.addLayer({
-          'id': 'selection-line',
-          'type': 'line',
-          'source': 'selection-source',
-          'paint': {
-          'line-color':  '#FFED00',
-          "line-opacity":0.6,
-        'line-width':2
-          },
-          filter: ['==', ['geometry-type'], 'LineString'],
-        });
+      //   })
+      //   this.map.addLayer({
+      //     'id': 'selection-line',
+      //     'type': 'line',
+      //     'source': 'selection-source',
+      //     'paint': {
+      //     'line-color':  '#FFED00',
+      //     "line-opacity":0.6,
+      //   'line-width':2
+      //     },
+      //     filter: ['==', ['geometry-type'], 'LineString'],
+      //   });
 
-        this.map.addLayer({
-          'id': 'selection-symbol',
-          'type': 'symbol',
-          'source': 'selection-source',
-          paint:{
-            "icon-opacity":1
-          },
-          layout: {
-            'icon-size': 1,
-            'icon-image': 'mapbox-marker-icon-yellow',
-            "icon-allow-overlap":true,
-            "icon-ignore-placement":true
-          },
-          filter: ['==', ['geometry-type'], 'Point'],
+      //   this.map.addLayer({
+      //     'id': 'selection-symbol',
+      //     'type': 'symbol',
+      //     'source': 'selection-source',
+      //     paint:{
+      //       "icon-opacity":1
+      //     },
+      //     layout: {
+      //       'icon-size': 1,
+      //       'icon-image': 'mapbox-marker-icon-yellow',
+      //       "icon-allow-overlap":true,
+      //       "icon-ignore-placement":true
+      //     },
+      //     filter: ['==', ['geometry-type'], 'Point'],
 
-        });
+      //   });
     });
     
     this.map.on('styleimagemissing', (e) => {
@@ -474,6 +487,16 @@ get selection(){
 
     this.map.on('togglePropertiesSideBar',()=>{
       this.toggleSidebar()
+    })
+
+    this.map.on('sourcedata',(e)=>{
+      if(e.sourceId!=MAP_DATA_META.MAP_DATA_SOURCE)
+      return
+
+
+      if(this.map.isSourceLoaded(MAP_DATA_META.MAP_DATA_SOURCE)){
+        this.selectionService.map=this.map
+      }
     })
 
 
@@ -659,19 +682,24 @@ get selection(){
   }
 
   highlightFeature(features?){
-    let data: any = {
-      'type': 'FeatureCollection',
-      'features': []
-    };
+    // let data: any = {
+    //   'type': 'FeatureCollection',
+    //   'features': []
+    // };
 
-    if (features.length > 0) {
-      features.forEach(feature => {
-        data.features.push(feature);
-      });}
-      (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
-      this.map.moveLayer('selection-polygon');
-      this.map.moveLayer('selection-line');
-      this.map.moveLayer('selection-symbol');
+    // if (features.length > 0) {
+    //   features.forEach(feature => {
+    //     data.features.push(feature);
+    //     console.log(feature)
+    //     // this.map.setFeatureState(feature,{'selected':true});
+    //   });
+    // }
+      // (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
+      // this.map.moveLayer('selection-polygon');
+      // this.map.moveLayer('selection-line');
+      // this.map.moveLayer('selection-symbol');
+
+
 
     
   }
@@ -736,7 +764,7 @@ get selection(){
   
     switch (action) {
       case 'zoom-to':
-          this.zoomTo(this.selectionService.selection.selected)
+          this.zoomTo(data.features.filter(f=>this.selectionService.selected.includes(f.properties[PROPERTIES.MAPCALC_ID]) && f))
         break;
       case 'delete':
         let featuresToDeleteIds = this.selectionService.selection.selected.map(ele=>ele.properties.mapcalc_id);
@@ -750,7 +778,7 @@ get selection(){
           
         }).afterClosed().subscribe(dialogData=>{
           console.log(dialogData)
-            let buffer = turf.buffer(this.selection[0],parseInt(dialogData['buffer-radius']),{units:'meters'});
+            let buffer = turf.buffer(data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]),parseInt(dialogData['buffer-radius']),{units:'meters'});
             buffer.properties={};
             buffer.properties[PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000);
             data.features.push(buffer);

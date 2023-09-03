@@ -33,16 +33,13 @@ export class FeatureListComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
   }
 
-  get selection(){
-    return this.selectionService.selection
-   };
 
 
    onRightClick(feature,e:any){
     e.stopPropagation();
     e.preventDefault();
 
-    if(this.selection.selected.length>1 &&  this.selection.isSelected(feature) ){
+    if(this.selectionService.selected.length>1 &&  this.selectionService.isSelected(feature) ){
       // show composite menu
     }else{
       this.selectFeature(feature,e);
@@ -57,10 +54,13 @@ export class FeatureListComponent implements OnChanges {
   selectFeature(feature,event){
     
     if(event.ctrlKey){
-      this.selection.toggle(feature)
+      // this.selection.toggle(feature)
+      this.selectionService.toggle(feature)
     }else{
-      this.selection.clear()
-      this.selection.select(feature)
+      // this.selection.clear()
+      // this.selection.select(feature)
+      this.selectionService.clearSelection();
+      this.selectionService.selectFeaturesFromList(feature)
     }
 
   }
@@ -110,7 +110,7 @@ export class FeatureListComponent implements OnChanges {
     // }
 
         if(e.target.classList.contains('maplibregl-canvas') ){
-          this.selection.clear(true)  
+          this.selectionService.clearSelection()  
 
     }
   }
@@ -120,6 +120,10 @@ export class FeatureListComponent implements OnChanges {
     e.stopPropagation();
     this.selectionService.contextMenuAction.next(action);
     this.closeMenu()
+  }
+
+  isSelected(feature){
+return this.selectionService.isSelected(feature)
   }
   
 }
