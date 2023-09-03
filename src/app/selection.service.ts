@@ -8,14 +8,10 @@ import { GeoJSONSource, Map } from 'maplibre-gl';
 @Injectable({
   providedIn: 'root'
 })
-export class SelectionService implements OnInit {
+export class SelectionService {
   map:Map
-  selection = new SelectionModel<any>(true, [],true,(o1,o2)=>o1==o2);
+  private  selection = new SelectionModel<any>(true, [],true,(o1,o2)=>o1==o2);
 
-
-  ngOnInit(): void {
-
-  }
 
   selectFeatureFromMap(event){
     let filteredFeatureIds =[...new Set( (this.map.queryRenderedFeatures(event.point) as any).filter((ele,i)=>ele.source== "mapcalc-data-source").map(ele=>ele.properties[PROPERTIES.MAPCALC_ID]))];
@@ -42,6 +38,10 @@ export class SelectionService implements OnInit {
 
   isSelected(feature){
     return this.selection.isSelected(feature.properties[PROPERTIES.MAPCALC_ID])
+  }
+
+  selectionChanged(){
+    return this.selection.changed
   }
 
   contextMenuAction = new Subject<any>()

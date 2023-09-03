@@ -121,7 +121,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 panelStructure:'list'|'json' =  'list';
 
 get selected(){
-  return this.selectionService.selection.selected
+  return this.selectionService.selected
 }
 
   constructor(
@@ -166,11 +166,11 @@ get selected(){
     });
     drawCtrl.appendChild(circleButton);
 
-    this.selectionService.selection.changed.subscribe((_:any)=>{
+    this.selectionService.selectionChanged().subscribe((_:any)=>{
 
       if(this.selectionService.selected.length==1){
         let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
-        this.currentPropertiesFeature=data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
+        // this.currentPropertiesFeature=data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
       }
 
       let data:any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
@@ -767,7 +767,7 @@ get selected(){
           this.zoomTo(data.features.filter(f=>this.selectionService.selected.includes(f.properties[PROPERTIES.MAPCALC_ID]) && f))
         break;
       case 'delete':
-        let featuresToDeleteIds = this.selectionService.selection.selected.map(ele=>ele.properties.mapcalc_id);
+        let featuresToDeleteIds = this.selectionService.selected.map(ele=>ele.properties.mapcalc_id);
         data.features = data.features.filter(feature=>!featuresToDeleteIds.includes(feature.properties.mapcalc_id));
         (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
         this.updatePanel();
