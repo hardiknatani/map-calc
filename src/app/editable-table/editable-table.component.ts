@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { FormGroup, FormBuilder, FormControl, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { PROPERTIES } from '../shared/enum';
 
 
 export interface PeriodicElement {
@@ -30,30 +31,44 @@ export class EditableTableComponent implements OnInit,OnChanges {
    VOForm: FormGroup;
    constructor(
      private fb: FormBuilder,
-     private _formBuilder: FormBuilder){}
+     private _formBuilder: FormBuilder){
+     }
  
    ngOnInit(): void {
+
+
      this.VOForm = this._formBuilder.group({
        VORows: this._formBuilder.array([])
      });
- 
-      this.VOForm = this.fb.group({
-               VORows: this.fb.array(Object.entries(this.properties).map((val:any) =>  this.fb.group({
-                  property: new FormControl(val[0]),
-                  value: new FormControl(val[1]),
-  
-                })
-               
-               )) //end of fb array
-             }); // end of form group cretation
 
-             this.dataSource = new MatTableDataSource((this.VOForm.get('VORows') as FormArray).controls);
+
  
-     this.VOForm.valueChanges.pipe(  
-      debounceTime(200),
-     distinctUntilChanged()).subscribe(_=>{
-      this.propertiesChanged.emit(this.VOForm.getRawValue())
-     })
+     let props = JSON.parse(JSON.stringify(this.properties));
+     delete props[PROPERTIES.MAPCALC_ID];
+     delete props['selected'];
+
+      this.VOForm = this.fb.group({
+        VORows: this.fb.array(
+          Object.entries(props).map((val: any) =>
+            this.fb.group({
+              property: new FormControl(val[0]),
+              value: new FormControl(val[1]),
+            })
+          )
+        ), //end of fb array
+      }); // end of form group cretation
+// to fucking do; why the fuck it is not setting correct properties
+      this.VOForm.valueChanges.pipe(  
+        debounceTime(200),
+       distinctUntilChanged()).subscribe(_=>{
+        let value = this.VOForm.getRawValue();
+        value.VORows.push({'property':PROPERTIES.MAPCALC_ID,'value':this.properties[PROPERTIES.MAPCALC_ID]});
+        value.VORows.push({'property':'selected','value':this.properties['selected']})
+        this.propertiesChanged.emit(value)
+       })
+      this.dataSource = new MatTableDataSource(
+        (this.VOForm.get('VORows') as FormArray).controls
+      );
  
    }
  
@@ -73,12 +88,15 @@ export class EditableTableComponent implements OnInit,OnChanges {
   while(control.length!=0){
    control.removeAt(0)
   }
-
+delete properties[PROPERTIES.MAPCALC_ID];
+delete properties['selected'];
   Object.entries(properties).forEach(ele=>{
-   control.push(this.fb.group({
-   property: new FormControl({value:ele[0],disabled:ele[0]=='mapcalc_id'?true:false}),
-   value: new FormControl({value:ele[1],disabled:ele[0]=='mapcalc_id'?true:false}),
-   }));
+    
+      control.push(this.fb.group({
+        property: new FormControl({value:ele[0],disabled:ele[0]==PROPERTIES.MAPCALC_ID?true:false}),
+        value: new FormControl({value:ele[1],disabled:ele[0]==PROPERTIES.MAPCALC_ID?true:false}),
+        }));
+
   });
 
   this.dataSource = new MatTableDataSource(control.controls)

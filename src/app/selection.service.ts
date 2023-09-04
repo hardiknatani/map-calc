@@ -13,14 +13,12 @@ export class SelectionService {
   private  selection = new SelectionModel<any>(true, [],true,(o1,o2)=>o1==o2);
 
 
-  selectFeatureFromMap(event){
-    let filteredFeatureIds =[...new Set( (this.map.queryRenderedFeatures(event.point) as any).filter((ele,i)=>ele.source== "mapcalc-data-source").map(ele=>ele.properties[PROPERTIES.MAPCALC_ID]))];
-   console.log(filteredFeatureIds)
-    this.selection.select(...filteredFeatureIds);
+  selectFeatureFromMap(feature){
+    this.selection.select(feature.properties[PROPERTIES.MAPCALC_ID]);
   }
 
   selectFeaturesFromList(feature){
-    this.selection.select(feature.properties[PROPERTIES.MAPCALC_ID])
+    this.selection.select(feature.properties[PROPERTIES.MAPCALC_ID]);
 
   }
 

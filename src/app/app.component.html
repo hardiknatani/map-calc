@@ -73,16 +73,17 @@
     <div class="map-wrap">
       <div #mapContainer id="map">
         <div id="right-sidebar" class=" collapsed map-overlay">
+          <div  class="px-1 h-7 w-full bg-red-500 text-white font-semibold text-sm flex justify-between items-center">
+            <span> {{currentPropertiesFeature?.geometry?.type || ""}}
+            </span>
+            <mat-icon matRipple (click)="map.fire('togglePropertiesSideBar')" > close </mat-icon>
+          </div>
           <div class=" p-2 h-full flex items-center justify-center whitespace-normal text-center " *ngIf="selected.length==0" ><h3>Select a Feature to view Properties</h3></div>
 
           <div class=" p-2 h-full flex items-center justify-center  whitespace-normal text-center" *ngIf="selected.length>1" ><h3>Select an Individual Feature to view Properties</h3></div>
-<div *ngIf="selected.length==1">
-  <div  class="px-1 h-7 w-full bg-red-500 text-white font-semibold text-sm flex justify-between items-center">
-    <span> {{currentPropertiesFeature?.geometry?.type}}
-    </span>
-    <mat-icon matRipple (click)="map.fire('togglePropertiesSideBar')" > close </mat-icon>
-  </div>
-  <div  class="sidebar-content rounded-rect flex-center" style="  padding: 7.5px 0 7.5px 7.5px;">
+      <div>
+
+  <div *ngIf="selected.length==1"  class="sidebar-content rounded-rect flex-center" style="  padding: 7.5px 0 7.5px 7.5px;">
     <app-editable-table  class="w-full" [properties]="currentPropertiesFeature.properties"
     (propertiesChanged)="onPropertiesChanged($event)"></app-editable-table>
     <div class="w-full h-auto" >

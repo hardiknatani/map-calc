@@ -1,7 +1,7 @@
 .mapboxgl-tile-boundaries
 { 
-  background: url('data:image/svg+xml;charset=UTF-8,<svg viewBox="0 0 46 46" width="22px" height="22px" xmlns="http://www.w3.org/2000/svg" ><path d="M40 4h-32c-2.21 0-4 1.79-4 4v32c0 2.21 1.79 4 4 4h32c2.21 0 4-1.79 4-4v-32c0-2.21-1.79-4-4-4zm-24 36h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8zm12 24h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8zm12 24h-8v-8h8v8zm0-12h-8v-8h8v8zm0-12h-8v-8h8v8z"></path></svg>');
-    background-position: center;
+  background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5 5h15v3H5zm12 5h3v9h-3zm-7 0h5v9h-5zm-5 0h3v9H5z" opacity=".3"/><path fill="currentColor" d="M20 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 19H5v-9h3v9zm7 0h-5v-9h5v9zm5 0h-3v-9h3v9zm0-11H5V5h15v3z"/></svg>');
+    background-position: inherit;
     background-repeat: no-repeat;
     background-size: 100%;
 }
