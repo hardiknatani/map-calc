@@ -170,6 +170,7 @@ get selected(){
 
       if(this.selectionService.selected.length==1){
         let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+        // to fucking do; why the fuck it is not setting correct properties
         // this.currentPropertiesFeature=data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
       }
 
@@ -362,16 +363,14 @@ get selected(){
         return;
       }
 
-      let selectedFeatures = this.map.queryRenderedFeatures(event.point);
-      // console.log("drawFeatures")
-      let drawFeatures = selectedFeatures.filter(
-        (feature) => feature.source == MAP_DATA_META.MAP_DATA_SOURCE
-      );
-      if (drawFeatures && drawFeatures.length > 0) {
-        let feature = drawFeatures[0];
-        this.selectionService.selectFeatureFromMap(event)
-        // this.selectionService.selection.clear();
-        // this.selectionService.selection.select(feature)
+      let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+
+      let filteredFeatureIds =[...new Set( (this.map.queryRenderedFeatures(event.point) as any).filter((ele,i)=>ele.source==MAP_DATA_META.MAP_DATA_SOURCE).map(ele=>ele.properties[PROPERTIES.MAPCALC_ID]))];
+
+      if (filteredFeatureIds && filteredFeatureIds.length > 0) {
+        let feature = data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==filteredFeatureIds[0]);
+        this.selectionService.clearSelection();
+        this.selectionService.selectFeatureFromMap(feature);
         this.addFeatureOptionPopup(event, feature);
       }
     });
@@ -398,7 +397,7 @@ get selected(){
            ['==', ['get', 'selected'], true],
             1,
            0.5],
-          'fill-outline-color': '#191D88',
+          'fill-outline-color': '#FFED00',
           'fill-antialias': false,
         },
         filter: ['==', ['geometry-type'], 'Polygon'],
@@ -502,7 +501,7 @@ get selected(){
 
   }
 
-  addFeatureOptionPopup(event, feature) {
+  addFeatureOptionPopup(event,feature) {
     let options = document.createElement('div');
 
     let editButton = document.createElement('button');
@@ -543,18 +542,14 @@ get selected(){
     let propertiesButton = document.createElement('button');
     propertiesButton.innerHTML = 'Properties';
     propertiesButton.addEventListener('click', () => {
-      // !this.sidenav.opened && this.sidenav.open();
       const id = 'right-sidebar';
       let elem = document.getElementById(id);
       let display = elem?.style.display;
   
-      // if(display == null || display == '' || display=='none' ){
         elem?.style.setProperty('display','block');
-      // }else if(display=='block'){
-      //   elem?.style.setProperty('display','none');
-  
-      // };
-      this.currentPropertiesFeature = feature;
+// to fucking do; why the fuck it is not setting correct properties
+
+      // this.currentPropertiesFeature = feature;
       featureOptionPopup.remove();
     });
 
@@ -742,11 +737,12 @@ get selected(){
                 mapcalc_id:Math.floor( Math.random() * 900000 + 100000).toString()
               }
             }else{
-              feature['properties']['mapcalc_id']=Math.floor( Math.random() * 900000 + 100000).toString()
+              feature['properties'][PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000).toString()
             }
           })
          }
           (that.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(geojson);
+          console.log(geojson.features.length)
           that.updatePanel();
           that.ngxSpinner.hide()
         } catch (e) {
