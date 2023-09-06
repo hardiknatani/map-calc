@@ -18,6 +18,10 @@ export class SelectionService {
   }
 
   selectFeaturesFromList(feature){
+    const popups = document.getElementsByClassName('maplibregl-popup');
+      for (var i = 0; i < popups.length; i++) {
+        popups[i].remove();
+      }
     this.selection.select(feature.properties[PROPERTIES.MAPCALC_ID]);
 
   }

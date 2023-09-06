@@ -12,6 +12,8 @@ export class FeatureListComponent implements OnChanges {
   contextMenuActions=[
     {viewValue:'Zoom To',value:'zoom-to',type:'button' },
     {viewValue:'Delete',value:'delete',type:'button'},
+    {viewValue:'Duplicate Features',value:'duplicate',type:'button'},
+
     {
       viewValue:'Actions',type:'dropdown',children:[
         {viewValue:'Buffer',value:'buffer',type:'button'},
