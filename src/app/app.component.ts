@@ -367,11 +367,15 @@ get selected(){
 
       let filteredFeatureIds =[...new Set( (this.map.queryRenderedFeatures(event.point) as any).filter((ele,i)=>ele.source==MAP_DATA_META.MAP_DATA_SOURCE).map(ele=>ele.properties[PROPERTIES.MAPCALC_ID]))];
 
-      if (filteredFeatureIds && filteredFeatureIds.length > 0) {
+      if (filteredFeatureIds && filteredFeatureIds.length ==1) {
         let feature = data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==filteredFeatureIds[0]);
         this.selectionService.clearSelection();
         this.selectionService.selectFeatureFromMap(feature);
         this.addFeatureOptionPopup(event, feature);
+      }
+
+      if (filteredFeatureIds && filteredFeatureIds.length >1) {
+        this.addMultipleFeaturePopup(data,filteredFeatureIds,event)
       }
     });
 
@@ -398,7 +402,7 @@ get selected(){
             1,
            0.5],
           'fill-outline-color': '#FFED00',
-          'fill-antialias': false,
+          // 'fill-antialias': false,
         },
         filter: ['==', ['geometry-type'], 'Polygon'],
       });
@@ -501,6 +505,44 @@ get selected(){
 
   }
 
+  addMultipleFeaturePopup(data,filteredFeatureIds,event){
+    let features = data.features.filter((f) =>
+      filteredFeatureIds.includes(f.properties[PROPERTIES.MAPCALC_ID])
+    );
+    let main = document.createElement('div');
+    features.forEach((f) => {
+      let btn = document.createElement('button');
+      btn.innerHTML = `Select ${f.geometry.type}`;
+      btn.addEventListener('mouseenter', (e) => {
+        this.selectionService.selectFeatureFromMap(f);
+      });
+      btn.addEventListener('mouseout', (e) => {
+        this.selectionService.clearSelection();
+      });
+      btn.addEventListener('click', (e) => {
+        this.selectionService.clearSelection();
+        this.selectionService.selectFeatureFromMap(f);
+        this.addFeatureOptionPopup(event, f);
+      });
+      main.appendChild(btn);
+    });
+
+    main.className = 'options-buttons';
+    let featuresPopup = new maplibregl.Popup({
+      closeOnClick: true,
+      closeButton: false,
+      anchor: 'left',
+    })
+      .setLngLat(event.lngLat)
+      .setDOMContent(main);
+    featuresPopup.addClassName('featureOptionsPopup');
+    const popups = document.getElementsByClassName('maplibregl-popup');
+    for (var i = 0; i < popups.length; i++) {
+      popups[i].remove();
+    }
+    featuresPopup.addTo(this.map);
+  }
+
   addFeatureOptionPopup(event,feature) {
     let options = document.createElement('div');
 
@@ -577,14 +619,11 @@ get selected(){
       .setDOMContent(options);
     featureOptionPopup.addClassName('featureOptionsPopup');
 
-    const popups = document.getElementsByClassName('featureOptionsPopup');
-    if (popups.length) {
-      popups[0].remove();
-      featureOptionPopup.addTo(this.map);
-    } else {
-      featureOptionPopup.addTo(this.map);
-    }
-
+    const popups = document.getElementsByClassName('maplibregl-popup');
+      for (var i = 0; i < popups.length; i++) {
+        popups[i].remove();
+      }
+    featureOptionPopup.addTo(this.map);
     featureOptionPopup.addClassName('featureOptionsPopup');
   }
 
@@ -742,7 +781,6 @@ get selected(){
           })
          }
           (that.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(geojson);
-          console.log(geojson.features.length)
           that.updatePanel();
           that.ngxSpinner.hide()
         } catch (e) {
@@ -770,10 +808,11 @@ get selected(){
         this.updateEditorGeojson()
         break;
         case 'buffer':
-          this.dialog.open(ActionParamFormComponent,{data:{controls:['buffer-radius']},width:"25vw",height:"25vh"
+          this.dialog.open(ActionParamFormComponent,{data:{controls:['buffer-radius']},minWidth:"25vw",minHeight:"20vh"
           
         }).afterClosed().subscribe(dialogData=>{
-          console.log(dialogData)
+          if(!dialogData || dialogData['buffer-radius']==null || dialogData['buffer-radius']==undefined)
+          return
             let buffer = turf.buffer(data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]),parseInt(dialogData['buffer-radius']),{units:'meters'});
             buffer.properties={};
             buffer.properties[PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000);
@@ -781,9 +820,23 @@ get selected(){
             (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
             this.updatePanel();
           })
+          break;
+          case 'duplicate':
+          data.features.forEach(f=>{
+            if(this.selectionService.isSelected(f)){
+              let properties=JSON.parse(JSON.stringify(f.properties));
+              properties['selected']=false;
+              properties['mapcalc_id']=Math.floor( Math.random() * 900000 + 100000).toString();
 
-
-
+              data.features.push({
+                type:'feature',
+                geometry:f.geometry,
+                properties
+              })
+            }
+          });
+          (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+            this.updatePanel()
           break;
     
       default:
