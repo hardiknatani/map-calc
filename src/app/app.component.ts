@@ -408,12 +408,35 @@ get selected(){
       });
 
       this.map.addLayer({
+        id: MAP_DATA_META.FILL_BORDER_LAYER,
+        type: 'line',
+        source: MAP_DATA_META.MAP_DATA_SOURCE,
+        paint: {
+          'line-color': '#E21818',
+          'line-opacity':['case',
+          ['==', ['get', 'selected'], true],
+           1,
+          0.5] ,
+           "line-width":['case',
+           ['==', ['get', 'selected'], true],
+            2.5,
+           1.5]
+          // 'fill-antialias': false,
+        },
+        filter: ['==', ['geometry-type'], 'Polygon'],
+      });
+
+      this.map.addLayer({
         id: MAP_DATA_META.LINE_LAYER,
         type: 'line',
         source: MAP_DATA_META.MAP_DATA_SOURCE,
         paint: {
           'line-color': 'red',
           'line-width': 5,
+          'line-opacity':['case',
+          ['==', ['get', 'selected'], true],
+           1,
+          0.5],
         },
         filter: ['==', ['geometry-type'], 'LineString'],
       });
@@ -426,10 +449,13 @@ get selected(){
           'icon-opacity': 1,
         },
         layout: {
-          'icon-size': 1,
           'icon-image': 'mapbox-marker-icon-red',
           "icon-allow-overlap":true,
-          "icon-ignore-placement":true
+          "icon-ignore-placement":true,
+          'icon-size':['case',
+          ['==', ['get', 'selected'], true],
+           1.5,
+          1],
         },
         filter: ['==', ['geometry-type'], 'Point'],
       });
@@ -813,6 +839,8 @@ get selected(){
         }).afterClosed().subscribe(dialogData=>{
           if(!dialogData || dialogData['buffer-radius']==null || dialogData['buffer-radius']==undefined)
           return
+        let f= data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
+        console.log(f)
             let buffer = turf.buffer(data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]),parseInt(dialogData['buffer-radius']),{units:'meters'});
             buffer.properties={};
             buffer.properties[PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000);

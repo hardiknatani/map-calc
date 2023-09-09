@@ -41,7 +41,32 @@
             "scripts": [
               "src/app/shared/draw-custom-modes/rectangle/rectangle.js",
               "src/app/shared/draw-custom-modes/circle/modes/CircleMode.js"
+            ],"allowedCommonJsDependencies":[
+              "geojson-equality",
+              "turf-jsts",
+              "density-clustering",
+              "skmeans",
+              "rbush",
+              "concaveman",
+              "object-assign",
+              "deep-equal",
+              "geojson-rbush",
+              "earcut",
+              "polygon-clipping",
+              "mapbox-gl",
+              "@mapbox/mapbox-gl-draw",
+              "maplibre-gl",
+              "codemirror/addon/edit/closebrackets",
+              "codemirror/addon/edit/matchbrackets",
+              "codemirror/addon/fold/brace-fold",
+              "codemirror/addon/fold/foldgutter",
+              "codemirror/addon/lint/json-lint",
+              "codemirror/addon/lint/lint",
+              "codemirror/lib/codemirror",
+              "codemirror/mode/javascript/javascript",
+              "jsonlint"
             ]
+            
           },
           "configurations": {
             "production": {
