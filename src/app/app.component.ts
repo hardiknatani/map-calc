@@ -8,7 +8,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSlider } from '@angular/material/slider';
 import * as MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { DrawCreateEvent } from '@mapbox/mapbox-gl-draw';
-import { InspectControl } from 'mapbox-gl-controls';
+import  InspectControl  from './shared/maplibre-custom-controls/InspectControl/InspectControl';
 import { IControl, GeoJSONSource, Map } from 'maplibre-gl';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { lastValueFrom } from 'rxjs';
@@ -252,6 +252,10 @@ get selected(){
     if (setActive) layerData.active = !layerData.active;
   }
 
+  generateMapcalcId(){
+    return Math.floor( Math.random() * 900000 + 100000);
+  }
+
   generateRandomColor() {
     let newColor = '#' + Math.floor(Math.random() * 900000 + 100000).toString();
     return newColor;
@@ -348,7 +352,6 @@ get selected(){
 
     this.map.on('draw.create', (e) => {
       let feature = e.features[0];
-
       let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
       feature['properties'][PROPERTIES.MAPCALC_ID] = Math.floor( Math.random() * 900000 + 100000);
       data.features.push(feature);
@@ -459,53 +462,6 @@ get selected(){
         },
         filter: ['==', ['geometry-type'], 'Point'],
       });
-
-      // this.map.addSource("selection-source",{
-      //   type:'geojson',
-      //   data:{
-      //   type:"FeatureCollection",
-      //   features:[]
-      // }});
-      //   this.map.addLayer({
-      //     'id': 'selection-polygon',
-      //     'type': 'fill',
-      //     'source': 'selection-source',
-      //     'paint': {
-      //     'fill-color':  '#FFED00',
-      //     "fill-opacity":0.5,
-      //   'fill-outline-color':'#FFED00'
-      //     },
-      //     filter: ['==', ['geometry-type'], 'Polygon'],
-
-      //   })
-      //   this.map.addLayer({
-      //     'id': 'selection-line',
-      //     'type': 'line',
-      //     'source': 'selection-source',
-      //     'paint': {
-      //     'line-color':  '#FFED00',
-      //     "line-opacity":0.6,
-      //   'line-width':2
-      //     },
-      //     filter: ['==', ['geometry-type'], 'LineString'],
-      //   });
-
-      //   this.map.addLayer({
-      //     'id': 'selection-symbol',
-      //     'type': 'symbol',
-      //     'source': 'selection-source',
-      //     paint:{
-      //       "icon-opacity":1
-      //     },
-      //     layout: {
-      //       'icon-size': 1,
-      //       'icon-image': 'mapbox-marker-icon-yellow',
-      //       "icon-allow-overlap":true,
-      //       "icon-ignore-placement":true
-      //     },
-      //     filter: ['==', ['geometry-type'], 'Point'],
-
-      //   });
     });
     
     this.map.on('styleimagemissing', (e) => {
@@ -621,6 +577,16 @@ get selected(){
       featureOptionPopup.remove();
     });
 
+    let splitButton = document.createElement('button');
+
+    if(feature.geometry.type.includes('Multi')){
+      splitButton.innerHTML = `Split into ${feature.geometry.type.slice(5,feature.geometry.type.length)}s`;
+      splitButton.addEventListener('click', () => {
+        this.onContextMenuAction('split');
+        featureOptionPopup.remove();
+      });
+    }
+
     let deleteButton = document.createElement('button');
     deleteButton.innerHTML = 'Delete';
     deleteButton.addEventListener('click', () => {
@@ -634,7 +600,13 @@ get selected(){
     });
 
     options.className = 'options-buttons';
-    options.append(editButton, infoButton, propertiesButton, deleteButton);
+    options.append(editButton, propertiesButton, );
+
+    if(feature.geometry.type.includes('Multi')){
+      options.append(splitButton)
+    };
+
+    options.append(deleteButton);
 
     let featureOptionPopup = new maplibregl.Popup({
       closeOnClick: true,
@@ -657,13 +629,13 @@ get selected(){
 
     if(action=='save'){
     let feature = action == 'save' ? this.draw.getAll().features[0]: this.currentEditFeature;
+    feature.properties.selected=false;
     let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
     data.features = data.features.filter(f=>
       f.properties.mapcalc_id!=this.currentEditFeature.properties.mapcalc_id
     )
     data.features.push(feature);
     (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
-
 
     }else if(action=='cancel'){
 
@@ -757,11 +729,7 @@ get selected(){
       // (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
       // this.map.moveLayer('selection-polygon');
       // this.map.moveLayer('selection-line');
-      // this.map.moveLayer('selection-symbol');
-
-
-
-    
+      // this.map.moveLayer('selection-symbol');    
   }
 
   zoomTo(features:any[] ) {
@@ -840,7 +808,6 @@ get selected(){
           if(!dialogData || dialogData['buffer-radius']==null || dialogData['buffer-radius']==undefined)
           return
         let f= data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
-        console.log(f)
             let buffer = turf.buffer(data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]),parseInt(dialogData['buffer-radius']),{units:'meters'});
             buffer.properties={};
             buffer.properties[PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000);
@@ -866,6 +833,36 @@ get selected(){
           (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
             this.updatePanel()
           break;
+
+          case "split":
+            let feature = data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
+            if(feature.geometry.type=="MultiPolygon"){
+              feature.geometry.coordinates.forEach((coords)=>{
+                let properties = JSON.parse(JSON.stringify(feature.properties));
+                properties[PROPERTIES.MAPCALC_ID]=this.generateMapcalcId()
+                data.features.push({properties:properties,geometry:{'type':'Polygon','coordinates':coords}});
+                }
+             );
+
+            }else if (feature.geometry.type=="MultiLineString"){
+              feature.geometry.coordinates.forEach((coords)=>{
+                let properties = JSON.parse(JSON.stringify(feature.properties));
+                properties[PROPERTIES.MAPCALC_ID]=this.generateMapcalcId()
+                data.features.push({properties:properties,geometry:{'type':'LineString','coordinates':coords}});
+                }
+             );
+            }else if(feature.geometry.type=="MultiPoint"){
+              feature.geometry.coordinates.forEach((coords)=>{
+                let properties = JSON.parse(JSON.stringify(feature.properties));
+                properties[PROPERTIES.MAPCALC_ID]=this.generateMapcalcId()
+                data.features.push({properties:properties,geometry:{'type':'Point','coordinates':coords}});
+                }
+             );
+            }
+            data.features= data.features.filter(f=>f['properties'][PROPERTIES.MAPCALC_ID]!=feature['properties'][PROPERTIES.MAPCALC_ID]);
+            (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+            this.updatePanel()
+            break;
     
       default:
         break;

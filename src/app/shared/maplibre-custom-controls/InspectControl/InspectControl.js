@@ -1,3 +1,4 @@
+import { MAP_DATA_META } from '../../enum';
 import popupTemplate from './popupTemplate';
 export default class InspectControl  {
     constructor(options) {
@@ -55,7 +56,7 @@ export default class InspectControl  {
             [event.point.x - selectThreshold, event.point.y + selectThreshold],
             [event.point.x + selectThreshold, event.point.y - selectThreshold], // top right (NE)
         ];
-        return this.map.queryRenderedFeatures(queryBox).filter(feature=>feature.source!="maptiler_planet");
+        return this.map.queryRenderedFeatures(queryBox).filter(feature=>(feature.source===MAP_DATA_META.MAP_DATA_SOURCE));
     }
     addPopup(features) {
         this.popupNode = popupTemplate(features);
