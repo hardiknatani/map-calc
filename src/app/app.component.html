@@ -72,6 +72,15 @@
     </div>
     <div class="map-wrap">
       <div #mapContainer id="map">
+        <div class="top-bar w-80 h-fit bg-white shadow-sm border rounded-br-lg rounded-bl-lg absolute left-96 z-50 p-1" *ngIf="topbarActions.length>0">
+          <div class="actions w-fit h-fit flex items-center gap-2 border-r-2 p-1">
+            <div *ngFor="let action of topbarActions">
+              <div class="p-0.5 hover:bg-slate-200 rounded text-center" [matTooltip]="action.viewValue" (click)="onContextMenuAction(action.value)">
+                <mat-icon class="align-middle	text-base cursor-pointer">{{action.icon}}</mat-icon>
+              </div>
+            </div>
+          </div>
+        </div>
         <div id="right-sidebar" class=" collapsed map-overlay">
           <div  class="px-1 h-7 w-full bg-red-500 text-white font-semibold text-sm flex justify-between items-center">
             <span> {{currentPropertiesFeature?.geometry?.type || ""}}
@@ -119,8 +128,9 @@
 </div>
           </div>
       </div>
-<div class="map-position-info" >
-<div class="flex gap-3">
+<div class="map-position-info  bg-white shadow-sm border rounded-br-lg rounded-bl-lg absolute left-1/2 z-50 p-3" >
+
+<div class="h-5 flex gap-3">
   <pre id="position-info"></pre>
   <pre id="zoom-info"></pre>
 </div>

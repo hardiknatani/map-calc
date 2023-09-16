@@ -118,7 +118,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   listFeatures:any[]=[];  
 
-panelStructure:'list'|'json' =  'list';
+  topbarActions:any[]=[]
+
+  panelStructure:'list'|'json' =  'list';
 
 get selected(){
   return this.selectionService.selected
@@ -185,6 +187,7 @@ get selected(){
     
     (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData({type: 'FeatureCollection',features: features});
     
+    this.updateTopbarOptions()
 
     });
 
@@ -200,6 +203,30 @@ get selected(){
     });
   }
   ngAfterViewInit(): void {}
+
+  updateTopbarOptions(){
+
+      let data:any =  (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
+      let selected=this.selectionService.selected
+
+      if(selected.length>0 && selected.length==1){
+        this.topbarActions = this.topbarActions.filter(ele=>!ele.value?.includes('merge'))
+      }if(selected.length>1){
+        if(this.topbarActions.find(ele=>ele.value?.includes('merge')))
+          return
+        if(data.features.every(ele=>ele.geometry.type=='Polygon'||ele.geometry.type=='MultiPolygon')){
+          this.topbarActions.push({viewValue:'Merge into MultiPolygon',value:'merge',icon:"join_full",type:'button',visible:true})
+        }
+        else if(  data.every(ele=>ele.geometry.type=='LineString'||ele.geometry.type=='MultiLineString')){
+          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true})
+
+        }else if(  data.every(ele=>ele.geometry.type=='Point'||ele.geometry.type=='MultiPoint')){
+          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true})
+
+        }
+      }
+
+  }
 
   handleLayerVisibility(layerData, setActive) {
     let source = this.map.getSource(layerData.id);
@@ -315,6 +342,13 @@ get selected(){
       zoom: 1,
     };
 
+    (
+      document.getElementById('position-info') as any
+    ).innerHTML = `<b>Lat: </b>${Number(initialState.lat).toFixed(
+      5
+    )}, <b>Lng: </b>${Number(initialState.lng).toFixed(5)}`;
+    (document.getElementById('zoom-info') as any).innerHTML =
+    '<b>Zoom</b>: ' + Number(initialState.zoom).toFixed(2);
     this.map = new Map({
       container: this.mapContainer.nativeElement,
       style: `https://api.maptiler.com/maps/5bbd1a63-591a-469a-bdaa-c89c18c32654/style.json?key=${this.API_KEY}`,
@@ -744,9 +778,9 @@ get selected(){
       });
       let bbox: any = turf.bbox(data);
       this.map.fitBounds((bbox as any), {
-        padding: 5, linear: true, speed: 5, animate: true
+         linear: true, speed: 5, animate: true,maxZoom:17
       });
-      this.map.setZoom(this.map.getZoom()-1.5)
+      // this.map.setZoom(this.map.getZoom()-0.5)
     }
   }
 
@@ -863,6 +897,17 @@ get selected(){
             (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
             this.updatePanel()
             break;
+          case "merge":
+          let newFeature:any=  turf.combine({
+            "type": "FeatureCollection",
+            "features": data.features.filter(ele=>this.selectionService.selected.includes(ele['properties'][PROPERTIES.MAPCALC_ID]))
+          }).features[0];
+          newFeature.properties={"mapcalc_id":this.generateMapcalcId()};
+          data.features=data.features.filter(ele=>!this.selectionService.selected.includes(ele['properties'][PROPERTIES.MAPCALC_ID]));
+          data.features.push(newFeature);
+          (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+          this.updatePanel();
+          break;
     
       default:
         break;
