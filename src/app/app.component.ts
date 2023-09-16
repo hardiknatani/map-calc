@@ -208,20 +208,32 @@ get selected(){
 
       let data:any =  (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
       let selected=this.selectionService.selected
-
+        if(selected.length==0){
+          this.topbarActions=[]
+        }
       if(selected.length>0 && selected.length==1){
         this.topbarActions = this.topbarActions.filter(ele=>!ele.value?.includes('merge'))
       }if(selected.length>1){
-        if(this.topbarActions.find(ele=>ele.value?.includes('merge')))
-          return
-        if(data.features.every(ele=>ele.geometry.type=='Polygon'||ele.geometry.type=='MultiPolygon')){
-          this.topbarActions.push({viewValue:'Merge into MultiPolygon',value:'merge',icon:"join_full",type:'button',visible:true})
-        }
-        else if(  data.every(ele=>ele.geometry.type=='LineString'||ele.geometry.type=='MultiLineString')){
-          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true})
+        this.topbarActions = this.topbarActions.filter(ele=>!ele.value?.includes('merge') && !ele.value?.includes('intersection'))
 
-        }else if(  data.every(ele=>ele.geometry.type=='Point'||ele.geometry.type=='MultiPoint')){
-          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true})
+
+        if(data.features.every(ele=>ele.geometry.type=='Polygon'||ele.geometry.type=='MultiPolygon')){
+          this.topbarActions.push({viewValue:'Merge into MultiPolygon',value:'merge',icon:"join_full",type:'button',visible:true});
+          this.topbarActions.push({viewValue:'Intersection',value:'intersection',icon:"join_right",type:'button',visible:true});
+          this.cdr.detectChanges();
+          return
+        }
+        else if(  data.features.every(ele=>ele.geometry.type=='LineString'||ele.geometry.type=='MultiLineString')){
+          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true});
+          this.cdr.detectChanges();
+
+          return
+
+        }else if(  data.features.every(ele=>ele.geometry.type=='Point'||ele.geometry.type=='MultiPoint')){
+          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true});
+          this.cdr.detectChanges();
+
+          return
 
         }
       }
@@ -908,6 +920,28 @@ get selected(){
           (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
           this.updatePanel();
           break;
+
+          case "intersection":
+            let features = data.features.filter(ele=>this.selectionService.selected.includes(ele['properties'][PROPERTIES.MAPCALC_ID]));
+            let intersection;
+
+            for(let i=0;i<features.length-1;i++){
+              if(!intersection){
+                intersection=turf.intersect(features[i],features[i+1])
+              }else{
+                intersection=turf.intersect(intersection,features[i+1])
+              }
+            }
+            if(intersection==null)
+            return
+            intersection.properties={
+              'mapcalc_id':this.generateMapcalcId()
+            };
+            data.features.push(intersection);
+            (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+
+            this.updatePanel();
+            break;
     
       default:
         break;
