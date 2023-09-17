@@ -207,29 +207,29 @@ get selected(){
   updateTopbarOptions(){
 
       let data:any =  (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
-      let selected=this.selectionService.selected
-        if(selected.length==0){
+      let selectedFeatures=data.features.filter(ele=>this.selectionService.selected.includes(ele['properties'][PROPERTIES.MAPCALC_ID]))
+        if(selectedFeatures.length==0){
           this.topbarActions=[]
         }
-      if(selected.length>0 && selected.length==1){
+      if(selectedFeatures.length>0 && selectedFeatures.length==1){
         this.topbarActions = this.topbarActions.filter(ele=>!ele.value?.includes('merge'))
-      }if(selected.length>1){
+      }if(selectedFeatures.length>1){
         this.topbarActions = this.topbarActions.filter(ele=>!ele.value?.includes('merge') && !ele.value?.includes('intersection'))
 
 
-        if(data.features.every(ele=>ele.geometry.type=='Polygon'||ele.geometry.type=='MultiPolygon')){
+        if(selectedFeatures.every(ele=>ele.geometry.type=='Polygon'||ele.geometry.type=='MultiPolygon')){
           this.topbarActions.push({viewValue:'Merge into MultiPolygon',value:'merge',icon:"join_full",type:'button',visible:true});
           this.topbarActions.push({viewValue:'Intersection',value:'intersection',icon:"join_right",type:'button',visible:true});
           this.cdr.detectChanges();
           return
         }
-        else if(  data.features.every(ele=>ele.geometry.type=='LineString'||ele.geometry.type=='MultiLineString')){
+        else if(  selectedFeatures.every(ele=>ele.geometry.type=='LineString'||ele.geometry.type=='MultiLineString')){
           this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true});
           this.cdr.detectChanges();
 
           return
 
-        }else if(  data.features.every(ele=>ele.geometry.type=='Point'||ele.geometry.type=='MultiPoint')){
+        }else if(  selectedFeatures.every(ele=>ele.geometry.type=='Point'||ele.geometry.type=='MultiPoint')){
           this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true});
           this.cdr.detectChanges();
 
