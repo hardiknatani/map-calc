@@ -907,6 +907,7 @@ get selected(){
             }
             data.features= data.features.filter(f=>f['properties'][PROPERTIES.MAPCALC_ID]!=feature['properties'][PROPERTIES.MAPCALC_ID]);
             (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+            this.selectionService.clearSelection()
             this.updatePanel()
             break;
           case "merge":
