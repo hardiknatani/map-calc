@@ -172,8 +172,7 @@ get selected(){
 
       if(this.selectionService.selected.length==1){
         let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
-        // to fucking do; why the fuck it is not setting correct properties
-        // this.currentPropertiesFeature=data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
+        this.currentPropertiesFeature=data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
       }
 
       let data:any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
@@ -617,7 +616,6 @@ get selected(){
       let display = elem?.style.display;
   
         elem?.style.setProperty('display','block');
-// to fucking do; why the fuck it is not setting correct properties
 
       // this.currentPropertiesFeature = feature;
       featureOptionPopup.remove();
@@ -718,10 +716,10 @@ get selected(){
     index = data.features.findIndex((f) =>f.properties[PROPERTIES.MAPCALC_ID] == this.currentPropertiesFeature.properties[PROPERTIES.MAPCALC_ID]);
     data.features.splice(index, 1, feature);
 
-    setTimeout(() => {
+    // setTimeout(() => {
       feature.geometry = this.currentPropertiesFeature.geometry;
       (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
-    }, 1000);
+    // }, 1000);
   }
 
   codeMirrorLoaded() {
