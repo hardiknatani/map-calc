@@ -47,13 +47,13 @@
       </mat-slide-toggle>
       JSON
       </div>
-      <div class="flex">
-        <button color="primary"  class="font-bold px-2 py-1 border bg-purple-300 rounded-md flex items-center justify-between" (click)="importInput.click()"  >
-          <mat-icon>file_upload</mat-icon>
+      <div class="flex gap-2">
+        <button color="primary"  class=" pr-1 py-0.5  bg-red-500 text-xs text-white rounded-md flex items-center justify-between" (click)="importInput.click()"  >
+          <mat-icon class="text-lg" >file_upload</mat-icon>
           Import 
         </button>
-        <button color="primary"  class="font-bold px-2 py-1 border bg-purple-300 rounded-md flex items-center justify-between" (click)="downloadFile()"  >
-          <mat-icon>download</mat-icon>
+        <button color="primary"  class=" pr-1 py-0.5  bg-red-500 text-xs text-white rounded-md flex items-center justify-between w-fit h-fit" (click)="downloadFile()"  >
+          <mat-icon class="text-lg" >download</mat-icon>
           Export 
         </button>
         <input #importInput id="importInput" (change)="readFile($event)"   class=" hidden" type="file" name="" id="">

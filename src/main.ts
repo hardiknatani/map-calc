@@ -13,6 +13,10 @@ import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/lint/lint';
 import 'codemirror/addon/lint/json-lint';
+import 'codemirror/addon/mode/overlay.js';
+import 'codemirror/mode/markdown/markdown';
+// import 'codemirror/mode/markdown/gfm';
+
 
 (window as any).jsonlint = jsonlint;
 

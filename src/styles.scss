@@ -39,3 +39,8 @@ body { font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mdc-data-table__content{
   margin-top: 20px !important;
 }
+
+.disabled-line {
+  background-color: #f0f0f0; /* Adjust the background color as needed */
+  color: #999; /* Adjust the text color as needed */
+}

@@ -22,7 +22,7 @@ import DrawRectangle from './shared/draw-custom-modes/rectangle/rectangle';
 import DragCirceMode from './shared/draw-custom-modes/circle/modes/DragCircleMode';
 import StaticMode from './shared/draw-custom-modes/static/Static';
 import SaveEditsControl from './shared/maplibre-custom-controls/EditSaveControl';
-import  {Editor,} from 'codemirror';
+import  CodeMirror, {Editor, LineHandle, overlayMode} from 'codemirror';
 import { normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
@@ -30,7 +30,48 @@ import { SelectionService } from './selection.service';
 import PropertiesControl from './shared/maplibre-custom-controls/PropertiesControl';
 import { NgxSpinnerService } from "ngx-spinner";
 import { ActionParamFormComponent } from './action-param-form/action-param-form.component';
+// CodeMirror.defineMode("json-readonly", function () {
+//   return {
+//       // Override the tokenizer to disable editing for specific keys
+//       token: function (stream, state) {
+//           // Match "mapcalc_id" or "selected" keys and prevent editing
+//           if (stream.match(/^\s*"(?:\\.|[^"\\])*"\s*:/)) {
+//               var key = stream.current().replace(/"/g, ""); // Remove quotes from the key
+//               if (key.includes("mapcalc_id")   || key.includes("selected")) {
+//                 console.log(key)
+//                   stream.skipToEnd();
+//                   return "json-key";
+//               }
+//           }
+//           // Allow editing of other keys and values
+//           stream.eatWhile(/[^:]/);
+//           stream.eat(":");
+//           return "json-value";
+//       },
+//   };
+// });
+// CodeMirror.defineMode("mapcalc-overlay", function(config, parserConfig) {
+//   var mapcalcOverlay = {
+    
+//     // Override the tokenizer to disable editing for specific keys
+//     token: function (stream, state) {
 
+//         // Match "mapcalc_id" or "selected" keys and prevent editing
+//         if (stream.match(/^\s*"(?:\\.|[^"\\])*"\s*:/)) {
+//             var key = stream.current().replace(/"/g, ""); // Remove quotes from the key
+//             if (key.includes("mapcalc_id")   || key.includes("selected")) {
+//                 stream.skipToEnd();
+//                 return "json-key";
+//             }
+//         }
+//         // Allow editing of other keys and values
+//         stream.eatWhile(/[^:]/);
+//         stream.eat(":");
+//         return "json-value";
+//     },
+// };
+//   return overlayMode(CodeMirror.getMode(config,parserConfig.backdrop ||  "javascript"), mapcalcOverlay,true);
+// });
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -120,7 +161,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   topbarActions:any[]=[]
 
-  panelStructure:'list'|'json' =  'list';
+  panelStructure:'list'|'json' =  'json';
 
 get selected(){
   return this.selectionService.selected
@@ -362,7 +403,7 @@ get selected(){
     '<b>Zoom</b>: ' + Number(initialState.zoom).toFixed(2);
     this.map = new Map({
       container: this.mapContainer.nativeElement,
-      style: `https://api.maptiler.com/maps/5bbd1a63-591a-469a-bdaa-c89c18c32654/style.json?key=${this.API_KEY}`,
+      style: `https://api.maptiler.com/maps/streets-dark/style.json?key=${this.API_KEY}`,
       center: [5.596785544036919, 60.019994761409535],
       zoom: initialState.zoom,
       attributionControl: false,
@@ -725,6 +766,38 @@ get selected(){
   codeMirrorLoaded() {
     this.editor = (this.editor as any).codeMirror;
     this.editor.setSize("20vw", "95vh");
+    
+    let that = this
+    this.editor.on("beforeChange", function (instance, change) {
+   
+      var line = instance.getLine(change.from.line);
+      var key = line.trim().replace(/"|\s/g, "");
+      let deletedContent = instance.getRange(change.from,change.to);
+      if(change.origin?.includes('delete')){
+      //  let deletedContent = instance.getRange(change.from,change.to);
+       if(deletedContent.includes("mapcalc_id") || deletedContent.includes("selected")){
+        change.cancel();
+                 //show notification - change not allowed 
+       }
+
+       let endLineContent = instance.getLine(change.to.line);
+       let endlineKeys = endLineContent.trim().replace(/"|\s/g, "");
+
+       if(endlineKeys.includes("mapcalc_id") || endlineKeys.includes("selected")){
+        change.cancel();
+                //show notification - change not allowed 
+       }
+        
+      }
+
+      if (key.includes("mapcalc_id") || key.includes("selected")) {
+        change.cancel();
+                //show notification - change not allowed 
+
+    }
+    });
+
+  
   }
 
   handleChange(e) {
@@ -736,6 +809,21 @@ get selected(){
   updateEditorGeojson(){
   this.editor.setValue( JSON.stringify((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data,null,2));
   this.editor.refresh();
+  let that = this;
+  this.editor.eachLine( (lineHandle:LineHandle)=> {
+    var lineText = lineHandle.text;
+    if (lineText.includes('"mapcalc_id"') || lineText.includes('"selected"')) {
+        this.editor.addLineClass(lineHandle, "background", "disabled-line");
+    }
+
+    if(lineText.includes('coordinates')){
+      // this.editor.f
+      console.log(lineHandle);
+      this.editor
+    }
+
+});
+
 
   }
 
@@ -839,8 +927,7 @@ get selected(){
           this.zoomTo(data.features.filter(f=>this.selectionService.selected.includes(f.properties[PROPERTIES.MAPCALC_ID]) && f))
         break;
       case 'delete':
-        let featuresToDeleteIds = this.selectionService.selected.map(ele=>ele.properties.mapcalc_id);
-        data.features = data.features.filter(feature=>!featuresToDeleteIds.includes(feature.properties.mapcalc_id));
+        data.features = data.features.filter(feature=>!this.selectionService.selected.includes(feature.properties.mapcalc_id));
         (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
         this.updatePanel();
         this.updateEditorGeojson()
