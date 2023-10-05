@@ -21,12 +21,14 @@
   <div class="w-full " >
     <div [ngStyle]="{display: panelStructure=='json' ? 'block' : 'none'}"
     class=" bg-white " >
-      <ngx-codemirror class="h-full" #codeMirror 
-      [options]="codeMirrorOptions"
-      [(ngModel)]="geojsonText"
-      (codeMirrorLoaded)="codeMirrorLoaded()"
-      (ngModelChange)="handleChange($event)">
-    </ngx-codemirror>
+
+  <ngx-codemirror class="h-full" #codeMirror 
+  [options]="codeMirrorOptions"
+  [(ngModel)]="geojsonText"
+  (codeMirrorLoaded)="codeMirrorLoaded()"
+>
+  </ngx-codemirror>
+
   </div>
   <div [ngStyle]="{display: panelStructure=='list' ? 'block' : 'none'}"  class=" bg-white  " >
       <app-feature-list *ngIf="listFeatures.length!=0" [features]="listFeatures" ></app-feature-list>
@@ -45,15 +47,17 @@
         </span>
         <mat-slide-toggle  (change)="onPanelStructureChanged($event)" color="primary">
       </mat-slide-toggle>
-      JSON
+      <span>JSON</span>
       </div>
-      <div class="flex">
-        <button color="primary"  class="font-bold px-2 py-1 border bg-purple-300 rounded-md flex items-center justify-between" (click)="importInput.click()"  >
-          <mat-icon>file_upload</mat-icon>
+      <button *ngIf="panelStructure=='json'" (click)='onEditDialog()' matRipple > <mat-icon >edit</mat-icon> </button>
+
+      <div class="flex gap-2 w-fit">
+        <button color="primary"  class=" pr-1 py-0.5  bg-red-500  text-white rounded-md flex items-center justify-between" style="font-size: 12px;" (click)="importInput.click()"  >
+          <mat-icon class="text-base" >file_upload</mat-icon>
           Import 
         </button>
-        <button color="primary"  class="font-bold px-2 py-1 border bg-purple-300 rounded-md flex items-center justify-between" (click)="downloadFile()"  >
-          <mat-icon>download</mat-icon>
+        <button  color="primary"  class=" pr-1 py-0.5  bg-red-500 text-white rounded-md flex items-center justify-between w-fit h-fit" style="font-size: 12px;" (click)="downloadFile()"  >
+          <mat-icon class="text-base" >download</mat-icon>
           Export 
         </button>
         <input #importInput id="importInput" (change)="readFile($event)"   class=" hidden" type="file" name="" id="">

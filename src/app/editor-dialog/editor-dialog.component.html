@@ -1,0 +1,16 @@
+<div class="flex justify-end" >
+    <div class=" bg-transparent absolute w-full  flex justify-end">
+        <button class="mr-1 mt-1 " [disabled]="hasError"    style="z-index: 9999;background-color: #ccccccce;box-shadow: none !important;"   (click)="closeDialog()"  mat-mini-fab    type="button">
+            <mat-icon > close</mat-icon>
+          </button>
+    </div>
+<div>
+    <div class="w-full h-12 bg-red-300 px-1 py-2" *ngIf="hasError" >Invalid GeoJSON, Clear the errors and try again</div>
+    <ngx-codemirror class="h-full" #codeMirror 
+[options]="codeMirrorOptions"
+[(ngModel)]="geojsonText"
+(codeMirrorLoaded)="codeMirrorLoaded()"
+(ngModelChange)="handleChange($event)">
+</ngx-codemirror>
+</div>
+</div>

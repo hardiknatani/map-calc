@@ -15,10 +15,11 @@ import { SelectionService } from './selection.service';
 import { FeatureListComponent } from './feature-list/feature-list.component';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { ActionParamFormComponent } from './action-param-form/action-param-form.component';
+import { EditorDialogComponent } from './editor-dialog/editor-dialog.component';
 @NgModule({
   declarations: [
     AppComponent,
-    EditableTableComponent,ClickOutsideDirective, FeatureListComponent, ActionParamFormComponent
+    EditableTableComponent,ClickOutsideDirective, FeatureListComponent, ActionParamFormComponent, EditorDialogComponent
   ],
   imports: [
     BrowserModule,

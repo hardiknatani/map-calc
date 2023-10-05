@@ -30,6 +30,7 @@ import { SelectionService } from './selection.service';
 import PropertiesControl from './shared/maplibre-custom-controls/PropertiesControl';
 import { NgxSpinnerService } from "ngx-spinner";
 import { ActionParamFormComponent } from './action-param-form/action-param-form.component';
+import { EditorDialogComponent } from './editor-dialog/editor-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -109,6 +110,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     autoCloseBrackets: true,
     matchBrackets: true,
     theme: 'eclipse',
+    readOnly:true
   };
 
   geojsonText = `  {
@@ -724,14 +726,9 @@ get selected(){
 
   codeMirrorLoaded() {
     this.editor = (this.editor as any).codeMirror;
-    this.editor.setSize("20vw", "95vh");
+    this.editor.setSize("20vw", "90vh");
   }
 
-  handleChange(e) {
-    if (!e.length) return;
-    let value = e;
-    validate(value, this.editor);
-  }
 
   updateEditorGeojson(){
   this.editor.setValue( JSON.stringify((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data,null,2));
@@ -757,23 +754,17 @@ get selected(){
     this.cdr.detectChanges()
   }
 
-  highlightFeature(features?){
-    // let data: any = {
-    //   'type': 'FeatureCollection',
-    //   'features': []
-    // };
-
-    // if (features.length > 0) {
-    //   features.forEach(feature => {
-    //     data.features.push(feature);
-    //     console.log(feature)
-    //     // this.map.setFeatureState(feature,{'selected':true});
-    //   });
-    // }
-      // (this.map.getSource('selection-source') as GeoJSONSource).setData(data)
-      // this.map.moveLayer('selection-polygon');
-      // this.map.moveLayer('selection-line');
-      // this.map.moveLayer('selection-symbol');    
+  onEditDialog(){
+    this.dialog.open(EditorDialogComponent,{
+      data:this.editor.getValue(),
+      panelClass:'editor-dialog',
+      autoFocus:false,
+      disableClose:true,
+      closeOnNavigation:true
+    }).afterClosed().subscribe(data=>{
+      console.log(data);
+      this.editor.setValue(data)
+    })
   }
 
   zoomTo(features:any[] ) {
@@ -843,7 +834,6 @@ get selected(){
         data.features = data.features.filter(feature=>!featuresToDeleteIds.includes(feature.properties.mapcalc_id));
         (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
         this.updatePanel();
-        this.updateEditorGeojson()
         break;
         case 'buffer':
           this.dialog.open(ActionParamFormComponent,{data:{controls:['buffer-radius']},minWidth:"25vw",minHeight:"20vh"
