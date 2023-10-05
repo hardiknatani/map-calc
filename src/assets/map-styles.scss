@@ -137,12 +137,9 @@
 
 
   .save-edits-ctrl{
-
-
-
     position: absolute;
-    top:26vh;
-    right: 0.75vw;
+    top:1.5vh;
+    right: 3.255vw;
     width: 125px;
     height: fit-content;
     padding: 5px;
@@ -278,4 +275,9 @@ align-items: center;
   .cm-s-eclipse .CodeMirror-matchingbracket {
     outline: 1px solid grey;
     color: black !important;
+  }
+
+  .disabled-line {
+    background-color: #f0f0f0; /* Adjust the background color as needed */
+    color: #999; /* Adjust the text color as needed */
   }

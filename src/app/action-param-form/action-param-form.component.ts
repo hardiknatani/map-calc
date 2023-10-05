@@ -20,9 +20,7 @@ export class ActionParamFormComponent implements OnInit {
   }
 
   initForm(controls:string[]){
-console.log(controls)
     controls.forEach(control=>{
-      console.log(control)
       this.form.addControl(control,new FormControl(null));
     })
   }
@@ -36,6 +34,5 @@ console.log(controls)
   }
 
   ngOnInit(){
-console.log(this.data)
   }
 }

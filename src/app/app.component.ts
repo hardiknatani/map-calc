@@ -22,7 +22,7 @@ import DrawRectangle from './shared/draw-custom-modes/rectangle/rectangle';
 import DragCirceMode from './shared/draw-custom-modes/circle/modes/DragCircleMode';
 import StaticMode from './shared/draw-custom-modes/static/Static';
 import SaveEditsControl from './shared/maplibre-custom-controls/EditSaveControl';
-import  {Editor,} from 'codemirror';
+import  {Editor, LineHandle,} from 'codemirror';
 import { normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
@@ -213,25 +213,28 @@ get selected(){
           this.topbarActions=[]
         }
       if(selectedFeatures.length>0 && selectedFeatures.length==1){
+        this.topbarActions.push({viewValue:'Create Rectangular Envelope',value:'envelope',icon:"fg-bbox-alt",type:'button',visible:true});
+        this.topbarActions.push({viewValue:'Create Buffer',value:'buffer',icon:"fg-buffer",type:'button',visible:true});
+
         this.topbarActions = this.topbarActions.filter(ele=>!ele.value?.includes('merge'))
       }if(selectedFeatures.length>1){
         this.topbarActions = this.topbarActions.filter(ele=>!ele.value?.includes('merge') && !ele.value?.includes('intersection'))
 
 
         if(selectedFeatures.every(ele=>ele.geometry.type=='Polygon'||ele.geometry.type=='MultiPolygon')){
-          this.topbarActions.push({viewValue:'Merge into MultiPolygon',value:'merge',icon:"join_full",type:'button',visible:true});
-          this.topbarActions.push({viewValue:'Intersection',value:'intersection',icon:"join_right",type:'button',visible:true});
+          this.topbarActions.push({viewValue:'Merge into MultiPolygon',value:'merge',icon:"fg-union",type:'button',visible:true});
+          this.topbarActions.push({viewValue:'Intersection',value:'intersection',icon:"fg-intersection",type:'button',visible:true});
           this.cdr.detectChanges();
           return
         }
         else if(  selectedFeatures.every(ele=>ele.geometry.type=='LineString'||ele.geometry.type=='MultiLineString')){
-          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true});
+          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"fg-union",type:'button',visible:true});
           this.cdr.detectChanges();
 
           return
 
         }else if(  selectedFeatures.every(ele=>ele.geometry.type=='Point'||ele.geometry.type=='MultiPoint')){
-          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"join_full",type:'button',visible:true});
+          this.topbarActions.push({viewValue:'Merge into MultiLineString',value:'merge',icon:"fg-union",type:'button',visible:true});
           this.cdr.detectChanges();
 
           return
@@ -732,8 +735,19 @@ get selected(){
 
   updateEditorGeojson(){
   this.editor.setValue( JSON.stringify((this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data,null,2));
-  this.editor.refresh();
+  this.editor.eachLine( (lineHandle:LineHandle)=> {
+    var lineText = lineHandle.text;
+    if (lineText.includes('"mapcalc_id"') || lineText.includes('"selected"')) {
+        this.editor.addLineClass(lineHandle, "background", "disabled-line");
+    }
 
+    // if(lineText.includes('coordinates')){
+    //   // this.editor.f
+    //   console.log(lineHandle);
+    //   this.editor
+    // }
+});
+    this.editor.refresh();
   }
 
   onPanelStructureChanged(e){
@@ -769,6 +783,7 @@ get selected(){
         }
       });
       (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(gjson);
+      this.zoomTo(gjson.features)
       this.updatePanel()
 
     })
@@ -818,6 +833,7 @@ get selected(){
          }
           (that.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(geojson);
           that.updatePanel();
+          that.zoomTo(geojson.features)
           that.ngxSpinner.hide()
         } catch (e) {
           that.ngxSpinner.hide()
@@ -837,8 +853,7 @@ get selected(){
           this.zoomTo(data.features.filter(f=>this.selectionService.selected.includes(f.properties[PROPERTIES.MAPCALC_ID]) && f))
         break;
       case 'delete':
-        let featuresToDeleteIds = this.selectionService.selected.map(ele=>ele.properties.mapcalc_id);
-        data.features = data.features.filter(feature=>!featuresToDeleteIds.includes(feature.properties.mapcalc_id));
+        data.features = data.features.filter(feature=>!this.selectionService.selected.includes(feature.properties.mapcalc_id));
         (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
         this.updatePanel();
         break;
@@ -848,11 +863,15 @@ get selected(){
         }).afterClosed().subscribe(dialogData=>{
           if(!dialogData || dialogData['buffer-radius']==null || dialogData['buffer-radius']==undefined)
           return
-        let f= data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
-            let buffer = turf.buffer(data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]),parseInt(dialogData['buffer-radius']),{units:'meters'});
+        // let f= data.features.find(f=>f.properties[PROPERTIES.MAPCALC_ID]==this.selectionService.selected[0]);
+        data.features.forEach(f=>{
+          if(this.selectionService.selected.includes(f.properties[PROPERTIES.MAPCALC_ID])){
+            let buffer = turf.buffer(f,parseInt(dialogData['buffer-radius']),{units:'meters'});
             buffer.properties={};
-            buffer.properties[PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000);
+            buffer.properties[PROPERTIES.MAPCALC_ID]=this.generateMapcalcId();
             data.features.push(buffer);
+          }
+        })
             (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
             this.updatePanel();
           })
@@ -938,6 +957,25 @@ get selected(){
 
             this.updatePanel();
             break;
+
+          case 'envelope':
+            let selectedFeatures=data.features.filter(ele=>this.selectionService.selected.includes(ele['properties'][PROPERTIES.MAPCALC_ID]));
+            let gjson:any = {
+              type:'FeatureCollection',
+              features:selectedFeatures
+            };
+           let envelope =  turf.envelope(gjson);
+          if(envelope){
+            if(!envelope.properties){
+              envelope.properties={}
+            }
+            envelope.properties['mapcalc_id']=this.generateMapcalcId()
+          }
+          data.features.push(envelope);
+          
+          (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
+          this.updatePanel();
+          break;
     
       default:
         break;

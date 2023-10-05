@@ -14,12 +14,12 @@ export class FeatureListComponent implements OnChanges {
     {viewValue:'Delete',value:'delete',type:'button',visible:true},
     {viewValue:'Duplicate Features',value:'duplicate',type:'button',visible:true},
 
-    {
-      viewValue:'Actions',type:'dropdown',visible:true,children:[
-        {viewValue:'Buffer',value:'buffer',type:'button',visible:true},
+    // {
+    //   viewValue:'Actions',type:'dropdown',visible:true,children:[
+    //     {viewValue:'Buffer',value:'buffer',type:'button',visible:true},
 
-      ]
-    }
+    //   ]
+    // }
 
   ]
 

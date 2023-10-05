@@ -76,11 +76,11 @@
     </div>
     <div class="map-wrap">
       <div #mapContainer id="map">
-        <div class="top-bar w-80 h-fit bg-white shadow-sm border rounded-br-lg rounded-bl-lg absolute left-96 z-50 p-1" *ngIf="topbarActions.length>0">
-          <div class="actions w-fit h-fit flex items-center gap-2 border-r-2 p-1">
+        <div class="top-bar w-fit h-fit bg-white shadow-sm border rounded-br-lg rounded-bl-lg absolute left-96 z-50 p-1" *ngIf="topbarActions.length>0">
+          <div class="actions w-fit h-fit flex items-center gap-2  p-1">
             <div *ngFor="let action of topbarActions">
-              <div class="p-0.5 hover:bg-slate-200 rounded text-center" [matTooltip]="action.viewValue" (click)="onContextMenuAction(action.value)">
-                <mat-icon class="align-middle	text-base cursor-pointer">{{action.icon}}</mat-icon>
+              <div class="py-0.5 px-1.5 hover:bg-slate-200 rounded text-center" [matTooltip]="action.viewValue" (click)="onContextMenuAction(action.value)">
+                <i class="align-middle	text-lg cursor-pointer" [ngClass]="action.icon"></i>
               </div>
             </div>
           </div>
