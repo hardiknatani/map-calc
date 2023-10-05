@@ -122,7 +122,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   topbarActions:any[]=[]
 
-  panelStructure:'list'|'json' =  'list';
+  panelStructure:'list'|'json' =  'json';
 
 get selected(){
   return this.selectionService.selected
