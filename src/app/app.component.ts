@@ -726,7 +726,7 @@ get selected(){
 
   codeMirrorLoaded() {
     this.editor = (this.editor as any).codeMirror;
-    this.editor.setSize("20vw", "90vh");
+    this.editor.setSize("20vw", "95vh");
   }
 
 
@@ -762,8 +762,15 @@ get selected(){
       disableClose:true,
       closeOnNavigation:true
     }).afterClosed().subscribe(data=>{
-      console.log(data);
-      this.editor.setValue(data)
+      let gjson = JSON.parse(data);
+      gjson.features.forEach(ele=>{
+        if(!ele.properties.hasOwnProperty('mapcalc_id')){
+          ele.properties.mapcalc_id=this.generateMapcalcId();
+        }
+      });
+      (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(gjson);
+      this.updatePanel()
+
     })
   }
 
