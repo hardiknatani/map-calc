@@ -23,7 +23,7 @@ import DragCirceMode from './shared/draw-custom-modes/circle/modes/DragCircleMod
 import StaticMode from './shared/draw-custom-modes/static/Static';
 import SaveEditsControl from './shared/maplibre-custom-controls/EditSaveControl';
 import  {Editor, LineHandle,} from 'codemirror';
-import { normalize, validate } from './geojsonHelpers';
+import { generateMapcalcId, normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
 import * as turf from '@turf/turf'
 import { SelectionService } from './selection.service';
@@ -295,47 +295,6 @@ get selected(){
     if (setActive) layerData.active = !layerData.active;
   }
 
-  generateMapcalcId(){
-    return Math.floor( Math.random() * 900000 + 100000);
-  }
-
-  generateRandomColor() {
-    let newColor = '#' + Math.floor(Math.random() * 900000 + 100000).toString();
-    return newColor;
-  }
-
-  parseFilter(v: any) {
-    let tryParseInt = (v: any) => {
-      if (v === '') return v;
-      if (isNaN(v)) return v;
-      return parseFloat(v);
-    };
-
-    let tryParseBool = (v: any) => {
-      const isString = typeof v === 'string';
-      if (!isString) {
-        return v;
-      }
-
-      if (v.match(/^\s*true\s*$/)) {
-        return true;
-      } else if (v.match(/^\s*false\s*$/)) {
-        return false;
-      } else {
-        return v;
-      }
-    };
-
-    v = tryParseInt(v);
-    v = tryParseBool(v);
-    return v;
-  }
-
-  showSettings(layer) {
-    this.selectedConfigLayer = layer;
-    this.showControls = true;
-  }
-
   toggleSidebar() {
     const id = 'right-sidebar';
     let elem = document.getElementById(id);
@@ -403,7 +362,7 @@ get selected(){
     this.map.on('draw.create', (e) => {
       let feature = e.features[0];
       let data: any = (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource)._data;
-      feature['properties'][PROPERTIES.MAPCALC_ID] = Math.floor( Math.random() * 900000 + 100000);
+      feature['properties'][PROPERTIES.MAPCALC_ID] = generateMapcalcId();
       data.features.push(feature);
       (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
       this.draw.delete(feature.id);
@@ -779,7 +738,7 @@ get selected(){
       let gjson = JSON.parse(data);
       gjson.features.forEach(ele=>{
         if(!ele.properties.hasOwnProperty('mapcalc_id')){
-          ele.properties.mapcalc_id=this.generateMapcalcId();
+          ele.properties.mapcalc_id=generateMapcalcId();
         }
       });
       (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(gjson);
@@ -824,10 +783,10 @@ get selected(){
           geojson.features.forEach(feature=>{
             if(!Object.keys(feature).includes('properties')){
               feature['properties']={
-                mapcalc_id:Math.floor( Math.random() * 900000 + 100000).toString()
+                mapcalc_id:generateMapcalcId()
               }
             }else{
-              feature['properties'][PROPERTIES.MAPCALC_ID]=Math.floor( Math.random() * 900000 + 100000).toString()
+              feature['properties'][PROPERTIES.MAPCALC_ID]=generateMapcalcId()
             }
           })
          }
@@ -868,10 +827,10 @@ get selected(){
           if(this.selectionService.selected.includes(f.properties[PROPERTIES.MAPCALC_ID])){
             let buffer = turf.buffer(f,parseInt(dialogData['buffer-radius']),{units:'meters'});
             buffer.properties={};
-            buffer.properties[PROPERTIES.MAPCALC_ID]=this.generateMapcalcId();
+            buffer.properties[PROPERTIES.MAPCALC_ID]=generateMapcalcId();
             data.features.push(buffer);
           }
-        })
+        });
             (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
             this.updatePanel();
           })
@@ -881,7 +840,7 @@ get selected(){
             if(this.selectionService.isSelected(f)){
               let properties=JSON.parse(JSON.stringify(f.properties));
               properties['selected']=false;
-              properties['mapcalc_id']=Math.floor( Math.random() * 900000 + 100000).toString();
+              properties['mapcalc_id']=generateMapcalcId();
 
               data.features.push({
                 type:'feature',
@@ -899,7 +858,7 @@ get selected(){
             if(feature.geometry.type=="MultiPolygon"){
               feature.geometry.coordinates.forEach((coords)=>{
                 let properties = JSON.parse(JSON.stringify(feature.properties));
-                properties[PROPERTIES.MAPCALC_ID]=this.generateMapcalcId()
+                properties[PROPERTIES.MAPCALC_ID]=generateMapcalcId();
                 data.features.push({properties:properties,geometry:{'type':'Polygon','coordinates':coords}});
                 }
              );
@@ -907,14 +866,14 @@ get selected(){
             }else if (feature.geometry.type=="MultiLineString"){
               feature.geometry.coordinates.forEach((coords)=>{
                 let properties = JSON.parse(JSON.stringify(feature.properties));
-                properties[PROPERTIES.MAPCALC_ID]=this.generateMapcalcId()
+                properties[PROPERTIES.MAPCALC_ID]=generateMapcalcId();
                 data.features.push({properties:properties,geometry:{'type':'LineString','coordinates':coords}});
                 }
              );
             }else if(feature.geometry.type=="MultiPoint"){
               feature.geometry.coordinates.forEach((coords)=>{
                 let properties = JSON.parse(JSON.stringify(feature.properties));
-                properties[PROPERTIES.MAPCALC_ID]=this.generateMapcalcId()
+                properties[PROPERTIES.MAPCALC_ID]=generateMapcalcId();
                 data.features.push({properties:properties,geometry:{'type':'Point','coordinates':coords}});
                 }
              );
@@ -929,7 +888,7 @@ get selected(){
             "type": "FeatureCollection",
             "features": data.features.filter(ele=>this.selectionService.selected.includes(ele['properties'][PROPERTIES.MAPCALC_ID]))
           }).features[0];
-          newFeature.properties={"mapcalc_id":this.generateMapcalcId()};
+          newFeature.properties={"mapcalc_id":generateMapcalcId()};
           data.features=data.features.filter(ele=>!this.selectionService.selected.includes(ele['properties'][PROPERTIES.MAPCALC_ID]));
           data.features.push(newFeature);
           (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
@@ -950,7 +909,7 @@ get selected(){
             if(intersection==null)
             return
             intersection.properties={
-              'mapcalc_id':this.generateMapcalcId()
+              'mapcalc_id':generateMapcalcId()
             };
             data.features.push(intersection);
             (this.map.getSource(MAP_DATA_META.MAP_DATA_SOURCE) as GeoJSONSource).setData(data);
@@ -969,7 +928,7 @@ get selected(){
             if(!envelope.properties){
               envelope.properties={}
             }
-            envelope.properties['mapcalc_id']=this.generateMapcalcId()
+            envelope.properties['mapcalc_id']=generateMapcalcId();
           }
           data.features.push(envelope);
           

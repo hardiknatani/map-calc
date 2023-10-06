@@ -1,4 +1,5 @@
 import maplibregl, { GeoJSONSource, IControl, Map } from 'maplibre-gl';
+import { generateMapcalcId } from '../../geojsonHelpers';
 export default class SaveEditsControl implements IControl {
 
     _map: any;
@@ -64,21 +65,21 @@ export default class SaveEditsControl implements IControl {
         let feature = draw.getAll().features[0];
         switch (feature.geometry.type) {
             case 'Polygon':
-              feature['properties']['id']=(Math.floor(Math.random() * 900000 + 100000));
+              feature['properties']['id']=generateMapcalcId()
               let polygonData:any =( this._map.getSource('polygon-draw-source') as GeoJSONSource)._data;
               polygonData.features.push(feature);
               (this._map.getSource('polygon-draw-source') as GeoJSONSource).setData(polygonData);
               break;
   
             case "LineString":
-              feature['properties']['id']=(Math.floor(Math.random() * 900000 + 100000));
+              feature['properties']['id']=generateMapcalcId()
               let lineData:any =( this._map.getSource('line-draw-source') as GeoJSONSource)._data;
               lineData.features.push(feature);
               (this._map.getSource('line-draw-source') as GeoJSONSource).setData(lineData);
             break;
   
             case "Point":
-              feature['properties']['id']=(Math.floor(Math.random() * 900000 + 100000));
+              feature['properties']['id']=generateMapcalcId()
               let pointData:any =( this._map.getSource('point-draw-source') as GeoJSONSource)._data;
               pointData.features.push(feature);
               console.log(pointData);

@@ -45,13 +45,13 @@
         <span>
           List
         </span>
-        <mat-slide-toggle  (change)="onPanelStructureChanged($event)" color="primary">
+        <mat-slide-toggle [checked]="true" (change)="onPanelStructureChanged($event)" color="primary">
       </mat-slide-toggle>
       <span>JSON</span>
       </div>
       <button *ngIf="panelStructure=='json'" (click)='onEditDialog()' matRipple > <mat-icon >edit</mat-icon> </button>
 
-      <div class="flex gap-2 w-fit">
+      <div *ngIf="panelStructure=='list'" class="flex gap-2 w-fit">
         <button color="primary"  class=" pr-1 py-0.5  bg-red-500  text-white rounded-md flex items-center justify-between" style="font-size: 12px;" (click)="importInput.click()"  >
           <mat-icon class="text-base" >file_upload</mat-icon>
           Import 
