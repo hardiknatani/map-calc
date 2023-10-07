@@ -1,7 +1,6 @@
 import { Component, ViewChild,Input,Inject, OnInit, Injector } from '@angular/core';
 import { validate } from '../geojsonHelpers';
 import { Editor } from 'codemirror';
-import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 

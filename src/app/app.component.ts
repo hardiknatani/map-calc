@@ -1,27 +1,12 @@
-import { formatNumber } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import {AfterViewInit,ChangeDetectorRef,Component,ElementRef,OnDestroy,OnInit,ViewChild,ViewEncapsulation,ViewChildren,QueryList} from '@angular/core';
-import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { MatSlider } from '@angular/material/slider';
 import  MapboxDraw from '@hardiknatani/mapbox-gl-draw'
-import { DrawCreateEvent } from '@mapbox/mapbox-gl-draw';
 import  InspectControl  from './shared/maplibre-custom-controls/InspectControl/InspectControl';
 import { IControl, GeoJSONSource, Map } from 'maplibre-gl';
-import { BlockUI, NgBlockUI } from 'ng-block-ui';
-import { lastValueFrom } from 'rxjs';
-import { API_KEY,basemaps,borderAndAreasLayers,colormaps, transparentIcon} from './shared/map.common';
+import { basemaps, transparentIcon} from './shared/map.common';
 import * as maplibregl from 'maplibre-gl';
 import { environment } from '../environments/environment';
-import TileBoundariesControl from './shared/maplibre-custom-controls/TileBoundariesControl';
-import { TileUtils } from './shared/tileutils';
-import MeasuresControl from 'maplibre-gl-measures';
-import DrawRectangle from './shared/draw-custom-modes/rectangle/rectangle';
-import DragCirceMode from './shared/draw-custom-modes/circle/modes/DragCircleMode';
-import StaticMode from './shared/draw-custom-modes/static/Static';
-import SaveEditsControl from './shared/maplibre-custom-controls/EditSaveControl';
 import  {Editor, LineHandle,} from 'codemirror';
 import { generateMapcalcId, normalize, validate } from './geojsonHelpers';
 import { MAP_DATA_META, PROPERTIES } from './shared/enum';
@@ -40,24 +25,14 @@ import { EditorDialogComponent } from './editor-dialog/editor-dialog.component';
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   map: Map;
 
-  @ViewChild('mapContainer', { static: true })
-  private mapContainer!: ElementRef<HTMLElement>;
+  @ViewChild('mapContainer', { static: true }) private mapContainer!: ElementRef<HTMLElement>;
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
   @ViewChild('codeMirror', { static: true }) editor!: Editor;
   @ViewChild('importInput', { static: true }) importInput!: ElementRef<HTMLInputElement>;
   turf = turf;
   Number=Number
-  selectedTab: any;
-  // @BlockUI() blockUI: NgBlockUI;
-  mapControls: any;
-  showFiller = false;
-  selectedConfigLayer: any = null;
   basemaps = basemaps;
-  borderAndAreasLayers = borderAndAreasLayers;
-  colormaps = colormaps;
-  selectedColorramp = new FormControl('Default');
   API_KEY = environment.maptilerApiKey;
-  bufferRadius = new FormControl();
   drawControlOptions = {
     displayControlsDefault: false,
     userProperties: true,
@@ -70,19 +45,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       point: true,
     },
   };
-  layersStyle: any;
   draw: any = new  MapboxDraw(this.drawControlOptions) as any as IControl;
   propertiesControl = new PropertiesControl()
-
-  showControls = false;
   selectedFeature: any;
-  tileUtils = new TileUtils();
-
-  tileUrl: String = '';
-  createTileKey(tileIndex) {
-    return `${tileIndex.zoom}_${tileIndex.y}_${tileIndex.x}`;
-  }
-
   isEditing = false;
   currentEditFeature: any;
   currentPropertiesFeature: any = {
@@ -116,20 +81,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 } `;
 
   listFeatures:any[]=[];  
-
   topbarActions:any[]=[]
-
   panelStructure:'list'|'json' =  'json';
 
-get selected(){
-  return this.selectionService.selected
-}
+  get selected(){
+    return this.selectionService.selected
+  }
 
   constructor(
     private dialog: MatDialog,
-    private fb: FormBuilder,
-    private bottomSheet: MatBottomSheet,
-    private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private selectionService:SelectionService,
     private ngxSpinner:NgxSpinnerService
@@ -165,12 +125,6 @@ get selected(){
 
   }
   ngOnDestroy() {
-    if (this.bottomSheet._openedBottomSheetRef) {
-      this.bottomSheet.dismiss();
-    }
-    [...this.borderAndAreasLayers].forEach((layer) => {
-      if (layer.active) layer.active = false;
-    });
   }
   ngAfterViewInit(): void {}
 
@@ -668,12 +622,6 @@ get selected(){
     if (lineText.includes('"mapcalc_id"') || lineText.includes('"selected"')) {
         this.editor.addLineClass(lineHandle, "background", "disabled-line");
     }
-
-    // if(lineText.includes('coordinates')){
-    //   // this.editor.f
-    //   console.log(lineHandle);
-    //   this.editor
-    // }
 });
     this.editor.refresh();
   }
