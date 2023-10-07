@@ -26,6 +26,7 @@
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/lint": "^6.4.0",
     "@ctrl/ngx-codemirror": "^7.0.0",
+    "@hardiknatani/mapbox-gl-draw": "^1.4.3-fork",
     "@mapbox/geojsonhint": "^3.2.0",
     "@mapbox/jsonlint-lines-primitives": "^2.0.2",
     "@mapbox/mapbox-gl-draw": "^1.3.0",

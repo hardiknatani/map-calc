@@ -6,7 +6,7 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSlider } from '@angular/material/slider';
-import * as MapboxDraw from '@mapbox/mapbox-gl-draw';
+import  MapboxDraw from '@hardiknatani/mapbox-gl-draw'
 import { DrawCreateEvent } from '@mapbox/mapbox-gl-draw';
 import  InspectControl  from './shared/maplibre-custom-controls/InspectControl/InspectControl';
 import { IControl, GeoJSONSource, Map } from 'maplibre-gl';
@@ -58,14 +58,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedColorramp = new FormControl('Default');
   API_KEY = environment.maptilerApiKey;
   bufferRadius = new FormControl();
-  drawControlOptions: MapboxDraw.MapboxDrawOptions = {
+  drawControlOptions = {
     displayControlsDefault: false,
     userProperties: true,
     modes: {
       ...MapboxDraw.modes,
-      draw_rectangle: DrawRectangle,
-      draw_circle: DragCirceMode,
-      static: StaticMode,
     },
     controls: {
       line_string: true,
@@ -74,7 +71,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   };
   layersStyle: any;
-  draw: any = new MapboxDraw(this.drawControlOptions) as any as IControl;
+  draw: any = new  MapboxDraw(this.drawControlOptions) as any as IControl;
   propertiesControl = new PropertiesControl()
 
   showControls = false;
@@ -141,34 +138,6 @@ get selected(){
 
   ngOnInit(): void {
     this.initMap();
-    let drawCtrl = Array.from(
-      document.getElementsByClassName('mapboxgl-ctrl-group')
-    ).filter((ele) =>
-      ele.children[0].classList.contains('mapbox-gl-draw_ctrl-draw-btn')
-    )[0];
-    let rectangleButton = document.createElement('button');
-    rectangleButton.classList.add('mapbox-gl-draw_ctrl-draw-btn');
-    rectangleButton.classList.add('mapbox-gl-draw_rectangle');
-    rectangleButton.addEventListener('click', () => {
-      if (this.draw.getMode() != 'draw_rectangle') {
-        this.draw.changeMode('draw_rectangle');
-      } else {
-        this.draw.changeMode('static');
-      }
-    });
-    drawCtrl.appendChild(rectangleButton);
-
-    let circleButton = document.createElement('button');
-    circleButton.classList.add('mapbox-gl-draw_ctrl-draw-btn');
-    circleButton.classList.add('mapbox-gl-draw_circle');
-    circleButton.addEventListener('click', () => {
-      if (this.draw.getMode() != 'draw_circle') {
-        this.draw.changeMode('draw_circle');
-      } else {
-        this.draw.changeMode('simple_select');
-      }
-    });
-    drawCtrl.appendChild(circleButton);
 
     this.selectionService.selectionChanged().subscribe((_:any)=>{
 
