@@ -3,7 +3,7 @@
 @use '../node_modules/@angular/material' as mat;
 @import "@angular/material/theming";
 @import '../node_modules/maplibre-gl/dist/maplibre-gl.css';
-@import "../node_modules/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+@import "../node_modules/@hardiknatani/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 @import "../src/app/shared/maplibre-custom-controls/controls.css";
 @import '../node_modules/tailwindcss/base.css';
 @import '../node_modules/tailwindcss/components.css';

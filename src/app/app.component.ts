@@ -28,7 +28,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) private mapContainer!: ElementRef<HTMLElement>;
   @ViewChild('sidenav', { static: true }) sidenav!: MatSidenav;
   @ViewChild('codeMirror', { static: true }) editor!: Editor;
-  @ViewChild('importInput', { static: true }) importInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('importInput') importInput!: ElementRef<HTMLInputElement>;
   turf = turf;
   Number=Number
   basemaps = basemaps;
@@ -126,7 +126,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   ngOnDestroy() {
   }
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void {
+    console.log(this.importInput)
+  }
 
   updateTopbarOptions(){
 
